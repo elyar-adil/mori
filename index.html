@@ -209,6 +209,16 @@ body.dark{--bg:#191b19;--side:#20231f;--list-bg:#22251f;--paper:#252823;--ink:#e
 @media(max-width:1120px) and (min-width:761px){.app{grid-template-columns:70px 270px minmax(0,1fr)}.sidebar{padding:20px 8px 12px}.sidebar-head{justify-content:center;padding:0 0 24px}.brand{gap:0}.brand-name,.brand-edition,.nav-section-label,.nav-item span:not(.nav-count),.sidebar-version{display:none}.nav-item{justify-content:center;padding:0;gap:0}.nav-item .nav-count{display:none}.sidebar-bottom{justify-content:center;padding:12px 0 0}.bottom-btn{padding:8px}.bottom-btn span{display:none}.note-sidebar .list-header{padding:22px 13px 13px}.list-heading-row h1{font-size:20px}.list-heading-row{gap:4px}.new-btn{padding:0 8px}.sync-state{max-width:135px;overflow:hidden;text-overflow:ellipsis}}
 @media(max-width:760px){.app{grid-template-columns:minmax(0,1fr)}.sidebar{position:fixed;inset:0 auto 0 0;width:min(248px,84vw);z-index:33;transform:translateX(-102%);transition:transform .18s ease;padding:20px 12px 12px;box-shadow:18px 0 48px rgba(0,0,0,.13)}.app.sidebar-open .sidebar{transform:translateX(0)}.note-sidebar{position:fixed;inset:0 auto 0 0;width:min(355px,92vw);z-index:32;transform:translateX(-102%);transition:transform .18s ease;box-shadow:18px 0 48px rgba(0,0,0,.11)}.app.list-open .note-sidebar{transform:translateX(0)}.overlay{display:block;position:fixed;inset:0;background:rgba(28,30,24,.28);z-index:31;opacity:0;pointer-events:none;transition:opacity .18s}.app.sidebar-open .overlay,.app.list-open .overlay{opacity:1;pointer-events:auto}.main{grid-column:1;grid-row:1}.nav-toggle-btn,.back-btn{display:grid}.topbar{height:48px;padding:0 10px;gap:3px}.status{display:none}.doc{padding:22px 22px 45vh}.title{font-size:27px;margin-bottom:12px}.editor{font-size:16px}.editor-toolbar{gap:4px;padding-bottom:8px;overflow-x:auto;flex-wrap:nowrap}.toolbar-group,.tool-btn{flex-shrink:0}.sync-state{display:none}.list-header{padding-top:calc(21px + env(safe-area-inset-top))}}
 
+
+/* Refined pointer context menu and the matching icon crop surface. */
+.context-menu{position:fixed;z-index:100;width:205px;padding:5px;background:var(--paper);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 38px rgba(35,34,25,.16);color:var(--ink)}
+.context-menu-title{font-size:10px;color:var(--faint);padding:7px 9px 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.context-menu button{display:flex;align-items:center;width:100%;height:32px;padding:0 9px;border-radius:6px;text-align:left;font-size:12px;color:var(--ink)}
+.context-menu button:hover{background:var(--hover)}
+.context-menu .danger{color:var(--danger)}
+.context-menu hr{border:0;border-top:1px solid var(--line);margin:4px 3px}
+.blk.quote{border-left-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+
 </style>
 </head>
 <body>
@@ -271,6 +281,7 @@ let lastCaret = 0;
 let saveTimer = null;
 let syncTimer = null;
 let toastTimer = null;
+let contextDismissHandler = null;
 let hist = { id: null, states: [], index: -1, last: 0 };
 
 /* ---------- small helpers ---------- */
@@ -1007,13 +1018,24 @@ function bindToolbar() {
   $('editor-toolbar').querySelectorAll('button').forEach((button) => {
     button.addEventListener('mousedown', (e) => e.preventDefault());
     button.addEventListener('click', () => {
-      const f=button.dataset.format,k=button.dataset.block;
-      if(f==='bold')wrapSelection('**','**');else if(f==='italic')wrapSelection('*','*');else if(f==='strike')wrapSelection('~~','~~');else if(f==='code')wrapSelection('`','`');else if(f==='link')wrapSelection('[','](https://)');
-      else if(k){
-        const n=currentNote();if(!n)return;const md=n.body||'',p=caretOffset()||0,start=md.lastIndexOf('\\n',Math.max(0,p-1))+1,rest=md.slice(start);
-        const m=rest.match(/^(#{1,6}\\s+|[-*+]\\s+|\\d+\\.\\s+|>\\s?|- \\[[ xX]\\]\\s+)/),clean=m?rest.slice(m[0].length):rest;
-        const prefix={h1:'# ',h2:'## ',bullet:'- ',ordered:'1. ',quote:'> ',task:'- [ ] '}[k];
-        applyBody(md.slice(0,start)+prefix+clean,start+prefix.length+(p-start),true);
+      const f = button.dataset.format, k = button.dataset.block;
+      if (f === 'bold') wrapSelection('**', '**');
+      else if (f === 'italic') wrapSelection('*', '*');
+      else if (f === 'strike') wrapSelection('~~', '~~');
+      else if (f === 'code') wrapSelection('\`', '\`');
+      else if (f === 'link') wrapSelection('[', '](https://)');
+      else if (k) {
+        const note = currentNote();
+        if (!note) return;
+        const md = note.body || '';
+        const p = caretOffset() == null ? md.length : caretOffset();
+        const start = md.lastIndexOf('\n', Math.max(0, p - 1)) + 1;
+        const lineEnd = md.indexOf('\n', p);
+        const rest = md.slice(start, lineEnd < 0 ? md.length : lineEnd);
+        const match = rest.match(/^(#{1,6}\s+|[-*+]\s+|\d+\.\s+|>\s?|- \[[ xX]\]\s+)/);
+        const clean = match ? rest.slice(match[0].length) : rest;
+        const prefix = { h1: '# ', h2: '## ', bullet: '- ', ordered: '1. ', quote: '> ', task: '- [ ] ' }[k];
+        applyBody(md.slice(0, start) + prefix + clean + md.slice(lineEnd < 0 ? md.length : lineEnd), start + prefix.length + Math.max(0, p - start), true);
       }
       focusEditor();
     });
@@ -1171,7 +1193,7 @@ function renderList() {
   }).join('');
   host.querySelectorAll('[data-id]').forEach((el) => {
     el.addEventListener('click', () => openNote(el.dataset.id));
-    el.addEventListener('contextmenu', (e) => { e.preventDefault(); openNote(el.dataset.id, false); openNoteMenu(); });
+    el.addEventListener('contextmenu', (e) => { e.preventDefault(); openNote(el.dataset.id, false); openRowContextMenu(el.dataset.id, e.clientX, e.clientY); });
   });
 }
 
@@ -1307,6 +1329,50 @@ function openSettings() {
   $('export-btn').addEventListener('click', exportNote);
   $('forget-token').addEventListener('click', forgetToken);
   $('save-connection').addEventListener('click', saveConnection);
+}
+
+function closeRowContextMenu() {
+  if (contextDismissHandler) {
+    document.removeEventListener('pointerdown', contextDismissHandler, true);
+    contextDismissHandler = null;
+  }
+  const menu = $('row-context-menu');
+  if (menu) menu.remove();
+}
+
+function openRowContextMenu(id, x, y) {
+  const note = currentNote();
+  if (!note || note.id !== id) return;
+  closeRowContextMenu();
+  const inTrash = !!note.deletedAt;
+  const item = (action, label, danger) =>
+    '<button type="button" data-context-action="' + action + '"' + (danger ? ' class="danger"' : '') + '>' + label + '</button>';
+  const content = inTrash
+    ? item('restore', '恢复笔记') + item('delete', '永久删除', true)
+    : item('favorite', note.favorite ? '取消收藏' : '加入收藏') +
+      item('pin', note.pinned ? '取消置顶' : '置顶笔记') +
+      item('export', '导出 Markdown') + '<hr>' + item('delete', '移到最近删除', true);
+  const left = Math.max(8, Math.min(x, window.innerWidth - 216));
+  const top = Math.max(8, Math.min(y, window.innerHeight - 210));
+  const root = $('modal-root');
+  root.innerHTML = '<div class="context-menu" id="row-context-menu" role="menu" style="left:' + left + 'px;top:' + top + 'px">' +
+    '<div class="context-menu-title">' + escapeHtml(note.title || '无标题') + '</div>' + content + '</div>';
+  const menu = $('row-context-menu');
+  menu.querySelectorAll('[data-context-action]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const action = button.dataset.contextAction;
+      closeRowContextMenu();
+      if (action === 'favorite') toggleFavorite();
+      if (action === 'pin') togglePin();
+      if (action === 'export') exportNote();
+      if (action === 'delete') trashNote();
+      if (action === 'restore') restoreNote();
+    });
+  });
+  contextDismissHandler = (event) => {
+    if (!menu.contains(event.target)) closeRowContextMenu();
+  };
+  document.addEventListener('pointerdown', contextDismissHandler, true);
 }
 
 function openNoteMenu() {
@@ -1897,6 +1963,7 @@ function bind() {
       return;
     }
     if (e.key === 'Escape') {
+      if ($('row-context-menu')) { closeRowContextMenu(); return; }
       if ($('modal-root').innerHTML) { closeModal(); return; }
       if (document.activeElement === $('search')) { $('search').blur(); return; }
       if (app.classList.contains('sidebar-open')) { closeSidebar(); return; }
