@@ -8,7 +8,10 @@
 
 ## GitHub Pages
 
-把 `index.html` 放到任意 GitHub Pages 静态站点的根目录即可发布：在仓库 Settings → Pages 里选择从 `main` 分支根目录部署，页面地址为 `https://<用户名>.github.io/<仓库名>/`。
+站点由 GitHub Actions 部署：推送到 `main` 后，`.github/workflows/pages.yml` 会把 `index.html` 作为站点根目录发布。
+
+- 源码：`https://github.com/elyar-adil/mori`
+- 页面：`https://elyar-adil.github.io/mori/`
 
 ## 本地打开
 
