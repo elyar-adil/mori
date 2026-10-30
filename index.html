@@ -201,7 +201,7 @@ body.dark{--bg:#191b19;--side:#20231f;--list-bg:#22251f;--paper:#252823;--ink:#e
 .note-sidebar{grid-column:2;grid-row:1;display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--list-bg);border-right:1px solid var(--line)}.list-header{padding:24px 18px 14px}.list-heading-row{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-bottom:16px}.list-eyebrow{font-size:10px;letter-spacing:.08em;font-weight:600;color:var(--muted);margin-bottom:4px}.list-heading-row h1{font-size:22px;line-height:1.15;letter-spacing:-.045em;font-weight:650;margin:0;color:var(--ink)}
 .new-btn{display:flex;align-items:center;justify-content:center;gap:5px;height:29px;padding:0 9px;border-radius:8px;background:var(--accent);color:#fff;font-size:11px;font-weight:600;box-shadow:none;white-space:nowrap;flex-shrink:0}.new-btn:hover{filter:brightness(1.06)}.new-btn svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
 .search-wrap{position:relative;display:block;padding:0;margin:0}.search-wrap>svg{position:absolute;left:10px;top:10px;width:14px;height:14px;stroke:var(--faint);fill:none;stroke-width:1.8;pointer-events:none}.search{width:100%;height:34px;border:1px solid transparent;border-radius:8px;background:color-mix(in srgb,var(--hover) 55%,var(--list-bg));padding:0 37px 0 31px;font-size:12px;color:var(--ink);outline:none}.search:focus{background:var(--paper);border-color:color-mix(in srgb,var(--accent) 35%,var(--line))}.search::placeholder{color:var(--faint)}.search-wrap kbd{position:absolute;right:9px;top:10px;font:10px var(--ui);color:var(--faint);pointer-events:none}
-.list{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:9px;min-height:0}.note-item{display:block;position:relative;width:100%;text-align:left;padding:10px 11px 11px;border-radius:9px;margin:2px 0;min-width:0}.note-item:hover{background:var(--hover)}.note-item.active{background:var(--accent-soft)}.note-item.active::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:2px;border-radius:2px;background:var(--accent)}.note-title{font:600 13px/1.4 var(--ui);letter-spacing:-.015em;color:var(--ink)}.note-excerpt{font-size:11.5px;line-height:1.55;color:var(--muted);margin-top:4px;-webkit-line-clamp:2}.note-date{font-size:10px;color:var(--faint);margin-top:6px}
+.list{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:9px;min-height:0}.note-item{display:block;position:relative;width:100%;text-align:left;padding:10px 11px 11px;border-radius:9px;margin:2px 0;min-width:0}.note-item:hover{background:var(--hover)}.note-item.active{background:var(--accent-soft)}.note-item.active::before{content:none;display:none}.note-title{font:600 13px/1.4 var(--ui);letter-spacing:-.015em;color:var(--ink)}.note-excerpt{font-size:11.5px;line-height:1.55;color:var(--muted);margin-top:4px;-webkit-line-clamp:2}.note-date{font-size:10px;color:var(--faint);margin-top:6px}
 .list-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 13px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);font-size:10px;color:var(--faint)}.sync-state{display:flex;align-items:center;gap:6px;min-width:0;white-space:nowrap}.sync-dot{width:6px;height:6px;background:var(--faint);border-radius:50%;display:inline-block;flex-shrink:0}.sync-dot.connected{background:#7c9a70}.sync-dot.busy{background:var(--accent);animation:syncpulse 1s ease-in-out infinite}@keyframes syncpulse{50%{opacity:.35}}
 .main{grid-column:3;grid-row:1;min-width:0;background:var(--paper)}.topbar{height:49px;border-bottom:1px solid var(--line);padding:0 21px;gap:6px}.status{font-size:10.5px;color:var(--faint);margin-left:3px}.icon-btn{width:30px;height:30px;border-radius:8px;color:var(--muted)}.icon-btn:hover{background:var(--hover);color:var(--ink)}.icon-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.nav-toggle-btn{display:none}.canvas{background:var(--paper)}.doc{max-width:760px;padding:29px clamp(36px,5.8vw,82px) 42vh}.title{font:650 30px/1.25 var(--ui);letter-spacing:-.045em;color:var(--ink);margin:0 0 13px}.editor{font:400 16px/1.82 var(--serif);color:var(--ink);min-height:55vh}.blk.h1,.blk.h2,.blk.h3,.blk.h4,.blk.h5,.blk.h6{font-family:var(--ui)}.blk.h1{font-size:27px;margin:20px 0 6px}.blk.h2{font-size:22px;margin:18px 0 5px}.blk.h3{font-size:18.5px;margin:15px 0 4px}.blk.quote{border-left-color:color-mix(in srgb,var(--accent) 45%,var(--line)}
 .empty-icon-frame{width:65px;height:65px;display:grid;place-items:center;overflow:hidden;border-radius:19px;background:var(--accent-soft);margin-bottom:16px}.empty-icon-frame img{width:100%;height:100%;object-fit:cover;transform:scale(1.28);mix-blend-mode:multiply}.doc-empty img{margin:0}
@@ -272,6 +272,104 @@ body.dark{--bg:#191b19;--side:#20231f;--list-bg:#22251f;--paper:#252823;--ink:#e
   .list-header{padding-top:calc(22px + env(safe-area-inset-top))}
 }
 
+
+/* Toolbar: visible, tactile, grouped controls */
+#list .note-item.active::before,
+#list .note-item.active::after{
+  content:none!important;
+  display:none!important;
+  width:0!important;
+  border:0!important;
+  background:transparent!important;
+}
+#list .note-item.active{
+  border:0!important;
+  border-left:0!important;
+  box-shadow:none!important;
+  background-image:none!important;
+}
+#list .note-item{border-left:0!important;box-shadow:none!important}
+.editor-toolbar{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px;
+  padding:5px 0 9px;
+  margin:0 0 17px;
+  border:0!important;
+  min-height:42px;
+}
+.editor-toolbar .toolbar-group{
+  display:flex;
+  align-items:center;
+  gap:2px;
+  padding:3px;
+  border:1px solid color-mix(in srgb,var(--line) 82%,transparent);
+  border-radius:10px;
+  background:color-mix(in srgb,var(--side) 62%,var(--paper));
+  box-shadow:0 1px 2px rgba(40,42,32,.035);
+}
+.editor-toolbar .tool-btn{
+  display:grid;
+  place-items:center;
+  flex:0 0 32px;
+  width:32px;
+  height:30px;
+  padding:0;
+  border:1px solid transparent;
+  border-radius:7px;
+  background:transparent;
+  color:var(--muted);
+  line-height:1;
+  transition:background .13s ease,border-color .13s ease,color .13s ease,box-shadow .13s ease;
+}
+.editor-toolbar .tool-btn svg{
+  display:block;
+  width:17px;
+  height:17px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:1.75;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.editor-toolbar .tool-btn:hover{
+  background:var(--paper);
+  border-color:var(--line);
+  color:var(--ink);
+  box-shadow:0 1px 2px rgba(30,32,24,.07);
+}
+.editor-toolbar .tool-btn:active{
+  background:var(--accent-soft);
+  border-color:color-mix(in srgb,var(--accent) 25%,var(--line));
+  color:var(--accent);
+  box-shadow:none;
+}
+.editor-toolbar .tool-btn:focus-visible{
+  outline:2px solid color-mix(in srgb,var(--accent) 55%,transparent);
+  outline-offset:1px;
+}
+.editor-toolbar .tool-btn.heading-btn{
+  flex-basis:34px;
+  width:34px;
+  font:700 10px/1 var(--ui);
+  letter-spacing:-.04em;
+  color:var(--muted);
+}
+.editor-toolbar .tool-btn.heading-btn:hover{color:var(--ink)}
+@media(max-width:760px){
+  .editor-toolbar{
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    overflow-y:hidden;
+    gap:6px;
+    padding:3px 0 9px;
+    scrollbar-width:none;
+  }
+  .editor-toolbar::-webkit-scrollbar{display:none}
+  .editor-toolbar .toolbar-group{flex:0 0 auto}
+}
+
 </style>
 </head>
 <body>
@@ -291,10 +389,25 @@ body.dark{--bg:#191b19;--side:#20231f;--list-bg:#22251f;--paper:#252823;--ink:#e
 <main class="main"><header class="topbar"><button class="icon-btn nav-toggle-btn" id="nav-btn" title="打开导航"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="icon-btn back-btn" id="back-btn" title="笔记列表"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h11M4 18h8"/></svg></button><span class="status" id="status">已保存</span><div class="spacer"></div><button class="icon-btn" id="sync-btn" title="同步 (⌘S)"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-13.6 5.7M4 12a8 8 0 0 1 13.6-5.7"/><path d="M20 4v5h-5M4 20v-5h5"/></svg></button><button class="icon-btn" id="star-btn" title="收藏"><svg viewBox="0 0 24 24"><path d="m12 3.5 2.7 5.5 6 .9-4.35 4.2 1.03 6L12 17.25 6.62 20.1l1.03-6L3.3 9.9l6-.9Z"/></svg></button><button class="icon-btn" id="more-btn" title="更多"><svg viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg></button></header>
 <div class="canvas" id="canvas"><div class="doc" id="doc"><textarea class="title" id="title" rows="1" placeholder="无标题" spellcheck="false"></textarea>
 <div class="editor-toolbar" id="editor-toolbar" role="toolbar" aria-label="格式工具栏">
-<div class="toolbar-group" role="group" aria-label="文字格式"><button type="button" class="tool-btn type-btn" data-format="bold" title="粗体" aria-label="粗体"><b>B</b></button><button type="button" class="tool-btn type-btn italic-btn" data-format="italic" title="斜体" aria-label="斜体"><i>I</i></button><button type="button" class="tool-btn strike-btn" data-format="strike" title="删除线" aria-label="删除线">S̶</button><button type="button" class="tool-btn" data-format="link" title="插入链接" aria-label="插入链接"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.07 0l2-2A5 5 0 0 0 12 3.93l-1.14 1.14M14 11a5 5 0 0 0-7.07 0l-2 2A5 5 0 0 0 12 17.07l1.14-1.14"/></svg></button><button type="button" class="tool-btn" data-format="code" title="行内代码" aria-label="行内代码"><svg viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></button></div>
-<div class="toolbar-group" role="group" aria-label="标题"><button type="button" class="tool-btn heading-btn" data-block="h1" title="一级标题" aria-label="一级标题">H1</button><button type="button" class="tool-btn heading-btn" data-block="h2" title="二级标题" aria-label="二级标题">H2</button></div>
-<div class="toolbar-group" role="group" aria-label="列表"><button type="button" class="tool-btn" data-block="bullet" title="无序列表" aria-label="无序列表"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg></button><button type="button" class="tool-btn" data-block="ordered" title="有序列表" aria-label="有序列表"><svg viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h10M3 5h2v3M3 12h3l-3 3h3M3 18h3"/></svg></button><button type="button" class="tool-btn" data-block="task" title="待办" aria-label="待办"><svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="6" height="6" rx="1"/><path d="m5 7 1.4 1.4L9 5.7M13 7h7M3.5 15h6v6h-6zM13 18h7"/></svg></button></div>
-<div class="toolbar-group" role="group" aria-label="引用"><button type="button" class="tool-btn" data-block="quote" title="引用" aria-label="引用"><svg viewBox="0 0 24 24"><path d="M10 11H5v7h6v-7a5 5 0 0 0-5-5M20 11h-5v7h6v-7a5 5 0 0 0-5-5"/></svg></button></div></div>
+<div class="toolbar-group" role="group" aria-label="文字格式">
+<button type="button" class="tool-btn" data-format="bold" title="粗体" aria-label="粗体"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h6.5a3.5 3.5 0 0 1 0 7H7zM7 12h7.5a3.5 3.5 0 0 1 0 7H7z"/></svg></button>
+<button type="button" class="tool-btn" data-format="italic" title="斜体" aria-label="斜体"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6M4 20h6M15 4 9 20"/></svg></button>
+<button type="button" class="tool-btn" data-format="strike" title="删除线" aria-label="删除线"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 7.5C8 5.3 9.7 4 12 4c2.5 0 4.4 1.2 4.8 3.2M5 12h14M8 16c.7 2.5 2.3 4 4.7 4 2.4 0 4.2-1.1 4.8-3"/></svg></button>
+<button type="button" class="tool-btn" data-format="link" title="插入链接" aria-label="插入链接"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l2-2A5 5 0 0 0 12 3.93l-1.14 1.14M14 11a5 5 0 0 0-7.07 0l-2 2A5 5 0 0 0 12 17.07l1.14-1.14"/></svg></button>
+<button type="button" class="tool-btn" data-format="code" title="行内代码" aria-label="行内代码"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></button>
+</div>
+<div class="toolbar-group" role="group" aria-label="标题">
+<button type="button" class="tool-btn heading-btn" data-block="h1" title="一级标题" aria-label="一级标题">H1</button>
+<button type="button" class="tool-btn heading-btn" data-block="h2" title="二级标题" aria-label="二级标题">H2</button>
+</div>
+<div class="toolbar-group" role="group" aria-label="列表">
+<button type="button" class="tool-btn" data-block="bullet" title="无序列表" aria-label="无序列表"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg></button>
+<button type="button" class="tool-btn" data-block="ordered" title="有序列表" aria-label="有序列表"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10M3 5h2v3M3 12h3l-3 3h3M3 18h3"/></svg></button>
+<button type="button" class="tool-btn" data-block="task" title="待办" aria-label="待办"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="6" height="6" rx="1"/><path d="m5 7 1.4 1.4L9 5.7M13 7h7M3.5 15h6v6h-6zM13 18h7"/></svg></button>
+</div>
+<div class="toolbar-group" role="group" aria-label="引用">
+<button type="button" class="tool-btn" data-block="quote" title="引用" aria-label="引用"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 11H5v7h6v-7a5 5 0 0 0-5-5M20 11h-5v7h6v-7a5 5 0 0 0-5-5"/></svg></button>
+</div></div>
 <div class="editor" id="editor" contenteditable="true" spellcheck="false" role="textbox" aria-multiline="true"></div></div><div class="doc-empty" id="empty" hidden><span class="empty-icon-frame"><img id="empty-icon" alt="" draggable="false"></span><h2>没有打开的笔记</h2><p>从列表选择一篇笔记，或者新建一个想法。</p><button class="btn" id="empty-new" type="button">新建笔记</button></div></div></main></div><div id="modal-root"></div>
 <div class="toast" id="toast"></div>
 <input type="file" id="import-file" accept=".md,.markdown,.txt,text/markdown,text/plain" hidden>
