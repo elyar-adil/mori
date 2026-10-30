@@ -406,6 +406,35 @@ u{text-decoration-thickness:1px;text-underline-offset:3px}
 .blk.math-block{user-select:none}
 .blk.math-block *{user-select:none}
 
+
+/* Responsive toolbar correction — never hide tools beyond the viewport */
+.editor-toolbar .toolbar-group{
+  background:color-mix(in srgb,var(--side) 82%,var(--paper));
+  border-color:color-mix(in srgb,var(--muted) 20%,var(--line));
+}
+.editor-toolbar .tool-btn{color:color-mix(in srgb,var(--ink) 76%,var(--muted))}
+.editor-toolbar .tool-btn svg{width:17px;height:17px;stroke-width:1.8}
+.editor-toolbar .tool-btn.heading-btn{font-size:10px}
+@media(max-width:760px){
+  .editor-toolbar{
+    display:flex;
+    flex-wrap:wrap!important;
+    overflow:visible!important;
+    overflow-x:visible!important;
+    overflow-y:visible!important;
+    gap:7px 8px;
+    padding:5px 0 11px;
+    scrollbar-width:auto;
+  }
+  .editor-toolbar .toolbar-group{flex:0 0 auto}
+}
+@media(max-width:420px){
+  .editor-toolbar{column-gap:6px;row-gap:6px}
+  .editor-toolbar .toolbar-group{gap:1px;padding:2px}
+  .editor-toolbar .tool-btn{flex-basis:29px;width:29px;height:29px}
+  .editor-toolbar .tool-btn.heading-btn{flex-basis:27px;width:27px;font-size:9px}
+}
+
 </style>
 </head>
 <body>
