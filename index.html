@@ -1590,9 +1590,9 @@ let pendingImageBookmark = null;
 
 function captureImageBookmark() {
   const range = selectionOffsets();
-  if (range) return { start:range.start, end:range.end };
+  if (range) return { noteId:state.currentId, start:range.start, end:range.end };
   const caret = caretOffset();
-  return caret == null ? null : { start:caret, end:caret };
+  return caret == null ? null : { noteId:state.currentId, start:caret, end:caret };
 }
 
 function blobAsDataUrl(blob) {
@@ -1649,6 +1649,7 @@ async function insertImageFile(file, bookmark) {
     const markdown = '![' + alt + '](' + src + ')';
     const note = currentNote();
     if (!note) throw new Error('请先打开一篇笔记。');
+    if (bookmark && bookmark.noteId && bookmark.noteId !== note.id) throw new Error('笔记已切换，请在目标笔记中重新插入图片。');
     const md = note.body || '';
     const range = bookmark || captureImageBookmark() || { start:md.length, end:md.length };
     const start = Math.max(0, Math.min(md.length, range.start));
