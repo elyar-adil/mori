@@ -2284,6 +2284,7 @@ function renderAll() {
     renderDoc({ caret: lastCaret, focus: false });
     growTitle();
   } else {
+    destroyTableWidgets();
     editor.innerHTML = '';
     titleEl.value = '';
     growTitle();
@@ -3151,18 +3152,26 @@ function bind() {
     }
     e.stopImmediatePropagation();
   }, true);
+  editor.addEventListener('input', (e) => {
+    if (e.target.closest && e.target.closest('.tabulator')) e.stopImmediatePropagation();
+  });
   editor.addEventListener('input', () => {
     if (composing) return;
     syncFromDom();
   });
 
-  editor.addEventListener('compositionstart', () => { composing = true; });
-  editor.addEventListener('compositionend', () => {
+  editor.addEventListener('compositionstart', (e) => {
+    if (e.target.closest && e.target.closest('.tabulator')) return;
+    composing = true;
+  });
+  editor.addEventListener('compositionend', (e) => {
+    if (e.target.closest && e.target.closest('.tabulator')) return;
     composing = false;
     syncFromDom();
   });
 
   editor.addEventListener('beforeinput', (e) => {
+    if (e.target.closest && e.target.closest('.tabulator')) return;
     const t = e.inputType;
     if (t === 'insertText' && !composing && typeof e.data === 'string' && e.data) {
       e.preventDefault();
@@ -3203,6 +3212,7 @@ function bind() {
   });
 
   editor.addEventListener('paste', (e) => {
+    if (e.target.closest && e.target.closest('.tabulator')) return;
     const clipboard = e.clipboardData;
     const imageItem = clipboard && Array.from(clipboard.items || []).find((item) => item.kind === 'file' && item.type.startsWith('image/'));
     if (imageItem) {
@@ -3255,6 +3265,7 @@ function bind() {
   });
 
   editor.addEventListener('keydown', (e) => {
+    if (e.target.closest && e.target.closest('.tabulator')) return;
     const imageBlock = e.target.closest && e.target.closest('.image-block');
     if (imageBlock && (e.key === 'Backspace' || e.key === 'Delete')) {
       e.preventDefault();
