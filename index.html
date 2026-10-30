@@ -395,6 +395,7 @@ u{text-decoration-thickness:1px;text-underline-offset:3px}
 .blk.table .table-action:disabled{opacity:.28;cursor:not-allowed}
 .blk.table .table-control-divider{height:17px;width:1px;margin:0 4px;background:var(--line)}
 .blk.table .table-scroll{max-width:100%;overflow:auto}
+.blk.table .table-grid-host{width:100%;min-width:420px}
 .blk.table .table-grid{width:100%;min-width:420px;border-collapse:separate;border-spacing:0;table-layout:fixed;font:12px/1.5 var(--ui);color:var(--ink)}
 .blk.table .table-grid th,.blk.table .table-grid td{height:38px;min-width:96px;padding:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--paper);vertical-align:middle}
 .blk.table .table-grid th:last-child,.blk.table .table-grid td:last-child{border-right:0}
@@ -552,6 +553,41 @@ u{text-decoration-thickness:1px;text-underline-offset:3px}
   .math-live-preview{min-height:88px}
   .blk.image-block .image-delete{opacity:1;pointer-events:auto}
 }
+
+
+/* Tabulator enhancement: keep the editor's quiet paper-like surface */
+.blk.table .table-grid-host{min-width:420px}
+.blk.table .tabulator{
+  width:100%;min-width:420px;border:0;background:var(--paper);color:var(--ink);
+  font:12px/1.5 var(--ui);
+}
+.blk.table .tabulator .tabulator-header{display:none}
+.blk.table .tabulator .tabulator-tableholder{background:var(--paper);overflow-x:auto}
+.blk.table .tabulator .tabulator-row{
+  min-height:38px;border-bottom:1px solid var(--line);background:var(--paper);color:var(--ink);
+}
+.blk.table .tabulator .tabulator-row:last-child{border-bottom:0}
+.blk.table .tabulator .tabulator-cell{
+  display:flex;align-items:center;min-height:38px;padding:0 10px;
+  border-right:1px solid var(--line);background:var(--paper);white-space:normal;
+}
+.blk.table .tabulator .tabulator-cell:last-child{border-right:0}
+.blk.table .tabulator .tabulator-row.mori-table-header-row,
+.blk.table .tabulator .tabulator-row.mori-table-header-row .tabulator-cell{
+  background:var(--accent-soft)!important;color:var(--ink);font-weight:650;
+}
+.blk.table .tabulator .tabulator-row:hover,
+.blk.table .tabulator .tabulator-row.tabulator-selected{background:var(--hover)}
+.blk.table .tabulator .tabulator-cell.tabulator-editing{
+  padding:0;border:1px solid var(--accent);background:var(--paper);
+}
+.blk.table .tabulator .tabulator-cell input{
+  display:block;width:100%;height:100%;min-height:36px;padding:7px 9px;
+  border:0;border-radius:0;outline:0;background:var(--paper);color:var(--ink);font:inherit;
+}
+.blk.table .tabulator .tabulator-cell input:focus{box-shadow:inset 0 0 0 1px var(--accent)}
+body.dark .blk.table .tabulator .tabulator-cell,
+body.dark .blk.table .tabulator .tabulator-row{background:var(--paper)}
 
 </style>
 </head>
@@ -937,7 +973,7 @@ function renderTableBlock(b,active,index) {
       '<button type="button" class="table-action" data-table-action="add-col" title="在末尾添加一列">＋ 列</button>' +
       '<button type="button" class="table-action" data-table-action="remove-col" title="删除当前列">－ 列</button>' +
     '</div>' +
-    '<div class="table-scroll"><table class="table-grid" role="grid"><thead><tr>'+header+'</tr></thead><tbody>'+body+'</tbody></table></div>' +
+    '<div class="table-scroll"><div class="table-grid-host"><table class="table-grid" role="grid"><thead><tr>'+header+'</tr></thead><tbody>'+body+'</tbody></table></div></div>' +
     '</section>';
 }
 function splitBlocks(md) {
@@ -1115,10 +1151,138 @@ function renderBlock(b, active, index) {
   return '<div class="' + cls + '"' + attrs + (p.num ? ' data-num="' + escapeHtml(p.num) + '"' : '') + '>' + marker + extra + inlineHtml(p.text) + '</div>';
 }
 
+let tabulatorLoaderPromise = null;
+
+function ensureTabulatorLoaded() {
+  if (window.Tabulator) return Promise.resolve(window.Tabulator);
+  if (tabulatorLoaderPromise) return tabulatorLoaderPromise;
+  tabulatorLoaderPromise = new Promise((resolve,reject) => {
+    if (!document.getElementById('mori-tabulator-css')) {
+      const link = document.createElement('link');
+      link.id = 'mori-tabulator-css';
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/tabulator-tables@6.5.0/dist/css/tabulator.min.css';
+      document.head.appendChild(link);
+    }
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/tabulator-tables@6.5.0/dist/js/tabulator.min.js';
+    script.async = true;
+    script.onload = () => window.Tabulator ? resolve(window.Tabulator) : reject(new Error('Tabulator 未能初始化'));
+    script.onerror = () => reject(new Error('表格增强组件加载失败'));
+    document.head.appendChild(script);
+  });
+  return tabulatorLoaderPromise;
+}
+
+function destroyTableWidgets() {
+  editor.querySelectorAll('.table-widget').forEach((widget) => {
+    if (widget._tabulator) {
+      try { widget._tabulator.destroy(); } catch (e) { /* stale widget */ }
+      widget._tabulator = null;
+    }
+  });
+}
+
+function tabulatorFields(widget) {
+  if (widget._tabulator) {
+    return widget._tabulator.getColumnDefinitions().map((column) => column.field).filter(Boolean);
+  }
+  return Array.from({length:Number(widget.dataset.columnCount || 0)},(_,i)=>'c'+i);
+}
+
+function initTableWidgets() {
+  const hosts = Array.from(editor.querySelectorAll('.table-grid-host')).filter((host) => !host.dataset.tabulatorMounted);
+  if (!hosts.length) return;
+  ensureTabulatorLoaded().then((Tabulator) => {
+    hosts.forEach((host) => {
+      if (!host.isConnected || host.dataset.tabulatorMounted) return;
+      const widget = host.closest('.table-widget');
+      if (!widget) return;
+      const model = parseMarkdownTable(widget.dataset.raw || '');
+      const columns = model.rows[0].map((_,index) => ({
+        title:'',
+        field:'c'+index,
+        editor:'input',
+        headerSort:false,
+        resizable:true,
+        minWidth:96,
+        widthGrow:1
+      }));
+      const data = model.rows.map((cells,index) => {
+        const row = {id:'mori-row-'+index+'-'+uid(),_moriHeader:index===0};
+        columns.forEach((column,col) => { row[column.field] = cells[col] == null ? '' : cells[col]; });
+        return row;
+      });
+      const instance = new Tabulator(host,{
+        data,
+        index:'id',
+        columns,
+        layout:'fitColumns',
+        headerVisible:false,
+        selectableRows:1,
+        rowHeight:38,
+        placeholder:'',
+        columnDefaults:{headerSort:false,editor:'input',resizable:true,minWidth:96},
+        rowFormatter(row) {
+          row.getElement().classList.toggle('mori-table-header-row',!!row.getData()._moriHeader);
+        },
+        cellClick(event,cell) {
+          widget.dataset.activeRow = String(cell.getRow().getData().id);
+          widget.dataset.activeCol = String(cell.getField());
+          refreshTableControlState(widget);
+        },
+        cellEdited() {
+          commitTabulatorTable(widget,false);
+        }
+      });
+      widget._tabulator = instance;
+      widget.dataset.columnCount = String(columns.length);
+      widget.dataset.activeRow = data[0] ? data[0].id : '';
+      widget.dataset.activeCol = columns[0] ? columns[0].field : '';
+      host.dataset.tabulatorMounted = 'true';
+      refreshTableControlState(widget);
+    });
+  }).catch(() => {
+    // Keep the built-in Markdown grid usable if the optional CDN is unavailable.
+  });
+}
+
+function readTabulatorTable(widget) {
+  const instance = widget && widget._tabulator;
+  if (!instance) return null;
+  const fields = tabulatorFields(widget);
+  const rows = instance.getData().map((record) => fields.map((field) => String(record[field] == null ? '' : record[field])));
+  const original = parseMarkdownTable(widget.dataset.raw || '');
+  const align = original.align.slice(0,fields.length);
+  while (align.length < fields.length) align.push('left');
+  return {rows,align};
+}
+
+function commitTabulatorTable(widget,structural) {
+  const note = currentNote();
+  if (!note || !widget || !widget.isConnected || !widget._tabulator) return;
+  const index = Number(widget.dataset.i);
+  const block = splitBlocks(note.body || '')[index];
+  if (!block || block.type !== 'table') return;
+  const model = readTabulatorTable(widget);
+  const raw = serializeMarkdownTable(model);
+  if (raw === block.raw) return;
+  const body = note.body || '';
+  note.body = body.slice(0,block.start) + raw + body.slice(block.start+block.raw.length);
+  widget.dataset.raw = raw;
+  widget.dataset.columnCount = String(model.rows[0] ? model.rows[0].length : 1);
+  note.updatedAt = Date.now();
+  histPush(note,block.start,!!structural);
+  saveSoon();
+  updateListItem();
+  updateStatusMeta();
+}
+
 function renderDoc(opts) {
   const o = opts || {};
   const note = currentNote();
   if (!note) {
+    destroyTableWidgets();
     editor.innerHTML = '';
     editor.classList.remove('is-empty');
     updateToolbarState();
@@ -1130,7 +1294,9 @@ function renderDoc(opts) {
   const focused = o.focus === true || document.activeElement === editor;
   if (typeof o.caret === 'number' && focused) active = blockIndexAt(blocks, o.caret);
   editor.classList.toggle('is-empty', md === '');
+  destroyTableWidgets();
   editor.innerHTML = blocks.map((b, i) => renderBlock(b, i === active, i)).join('');
+  initTableWidgets();
   if (typeof o.caret === 'number' && focused) {
     setCaret(o.caret);
     focusEditor();
@@ -2673,6 +2839,8 @@ function deleteImageBlock(block) {
 }
 
 function readTableWidget(table) {
+  const enhanced = readTabulatorTable(table);
+  if (enhanced) return enhanced;
   const rows = [];
   const header = table.querySelector('thead tr');
   if (header) rows.push(Array.from(header.querySelectorAll('.table-cell-input')).map((input) => input.value));
@@ -2688,12 +2856,19 @@ function readTableWidget(table) {
 }
 
 function refreshTableControlState(table) {
+  const removeRow = table.querySelector('[data-table-action="remove-row"]');
+  const removeCol = table.querySelector('[data-table-action="remove-col"]');
+  if (table._tabulator) {
+    const rows = table._tabulator.getData();
+    const fields = tabulatorFields(table);
+    const active = rows.find((row) => row.id === table.dataset.activeRow);
+    if (removeRow) removeRow.disabled = rows.length <= 2 || !active || !!active._moriHeader;
+    if (removeCol) removeCol.disabled = fields.length <= 1;
+    return;
+  }
   const rows = table.querySelectorAll('thead tr,tbody tr').length;
   const columns = table.querySelectorAll('thead th').length;
   const activeRow = Number(table.dataset.activeRow || 0);
-  const activeCol = Number(table.dataset.activeCol || 0);
-  const removeRow = table.querySelector('[data-table-action="remove-row"]');
-  const removeCol = table.querySelector('[data-table-action="remove-col"]');
   if (removeRow) removeRow.disabled = rows <= 2 || activeRow === 0;
   if (removeCol) removeCol.disabled = columns <= 1;
 }
@@ -2763,6 +2938,62 @@ function handleTableAction(button) {
   const table = button.closest('.table-widget');
   if (!table) return;
   const action = button.dataset.tableAction;
+  if (table._tabulator) {
+    const instance = table._tabulator;
+    const rows = instance.getData();
+    const fields = tabulatorFields(table);
+    const active = rows.find((row) => row.id === table.dataset.activeRow);
+    const activeField = fields.includes(table.dataset.activeCol) ? table.dataset.activeCol : fields[0];
+    if (action === 'add-row') {
+      const record = {id:'mori-row-'+uid(),_moriHeader:false};
+      fields.forEach((field) => { record[field] = ''; });
+      instance.addRow(record,false).then((row) => {
+        table.dataset.activeRow = String(row.getData().id);
+        commitTabulatorTable(table,true);
+        refreshTableControlState(table);
+        const cell = row.getCell(fields[0]);
+        if (cell) cell.edit();
+      });
+      return;
+    }
+    if (action === 'remove-row') {
+      if (rows.length <= 2 || !active || active._moriHeader) return;
+      instance.getRow(active.id).delete().then(() => {
+        const remaining = instance.getData();
+        table.dataset.activeRow = remaining.length > 1 ? remaining[remaining.length-1].id : (remaining[0] ? remaining[0].id : '');
+        commitTabulatorTable(table,true);
+        refreshTableControlState(table);
+      });
+      return;
+    }
+    if (action === 'add-col') {
+      const numeric = fields.map((field) => Number(String(field).replace(/^c/,''))).filter(Number.isFinite);
+      const field = 'c' + (Math.max(-1,...numeric) + 1);
+      instance.addColumn({title:'',field,editor:'input',headerSort:false,resizable:true,minWidth:96,widthGrow:1},false).then(() => {
+        instance.getRows().forEach((row) => row.update({[field]:''}));
+        table.dataset.activeCol = field;
+        commitTabulatorTable(table,true);
+        refreshTableControlState(table);
+        const data = instance.getData();
+        const target = data[0] && instance.getRow(data[0].id);
+        const cell = target && target.getCell(field);
+        if (cell) cell.edit();
+      });
+      return;
+    }
+    if (action === 'remove-col') {
+      if (fields.length <= 1) return;
+      const field = fields.includes(activeField) ? activeField : fields[fields.length-1];
+      instance.deleteColumn(field).then(() => {
+        const remaining = tabulatorFields(table);
+        table.dataset.activeCol = remaining[Math.min(fields.indexOf(field),remaining.length-1)] || remaining[0] || '';
+        commitTabulatorTable(table,true);
+        refreshTableControlState(table);
+      });
+      return;
+    }
+    return;
+  }
   const model = readTableWidget(table);
   let row = Number(table.dataset.activeRow || 0);
   let col = Number(table.dataset.activeCol || 0);
