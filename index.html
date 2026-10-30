@@ -401,6 +401,11 @@ u{text-decoration-thickness:1px;text-underline-offset:3px}
 u{text-decoration-thickness:1px;text-underline-offset:3px}
 @media(max-width:760px){.blk.table{overflow-x:auto}.blk.table .table-row{min-width:440px}}
 
+
+/* Keep math blocks atomic while preserving their Markdown source offsets */
+.blk.math-block{user-select:none}
+.blk.math-block *{user-select:none}
+
 </style>
 </head>
 <body>
@@ -967,19 +972,24 @@ function caretOffset() {
 }
 
 function setCaret(offset) {
-  const blocks = blockEls();
-  if (!blocks.length) return;
-  const off = Math.max(0, offset);
-  let acc = 0;
-  for (const b of blocks) {
-    const len = b.textContent.length;
-    if (off <= acc + len) {
-      placeCaretInBlock(b, off - acc);
+  const blocks=blockEls();
+  if(!blocks.length)return;
+  const off=Math.max(0,offset);
+  let acc=0;
+  for(let i=0;i<blocks.length;i++){
+    const b=blocks[i],len=blockSourceText(b).length;
+    if(off<=acc+len){
+      if(b.classList.contains('math-block')){
+        if(blocks[i+1])placeCaretInBlock(blocks[i+1],0);
+        else placeRangeAt(editor,i+1);
+      }else placeCaretInBlock(b,off-acc);
       return;
     }
-    acc += len + 1;
+    acc+=len+1;
   }
-  placeCaretInBlock(blocks[blocks.length - 1], blocks[blocks.length - 1].textContent.length);
+  const last=blocks[blocks.length-1];
+  if(last.classList.contains('math-block'))placeRangeAt(editor,blocks.length);
+  else placeCaretInBlock(last,blockSourceText(last).length);
 }
 
 function placeCaretInBlock(block, pos) {
@@ -1314,7 +1324,7 @@ function bindToolbar() {
       else if(insert==='codeblock')insertBlockTemplate('\`\`\`\n\n\`\`\`',4);
       else if(insert==='hr')insertBlockTemplate('---',3);
       else if(insert==='table')insertBlockTemplate('| 标题 1 | 标题 2 |\n| --- | --- |\n| 内容 | 内容 |',2);
-      else if(insert==='math')insertBlockTemplate('$\n\\frac{a}{b} = c\n$',9);
+      else if(insert==='math')insertBlockTemplate('$\n\\frac{a}{b} = c\n$\n',21);
       focusEditor();
     });
   });
@@ -2196,7 +2206,12 @@ function bind() {
       const note=currentNote(),blocks=splitBlocks(note?note.body||'':''),block=blocks[Number(mathBlock.dataset.i)];
       if(block&&block.type==='math'){
         const edited=window.prompt('编辑 LaTeX 公式',mathExpression(block.raw));
-        if(edited!=null){const raw='$\n'+edited+'\n$',body=note.body||'';applyBody(body.slice(0,block.start)+raw+body.slice(block.start+block.raw.length),block.start+3+edited.length,true);}
+        if(edited!=null){
+          const raw='$\n'+edited+'\n$',body=note.body||'';
+          let next=body.slice(0,block.start)+raw+body.slice(block.start+block.raw.length);
+          if(block.start+raw.length===next.length)next+='\n';
+          applyBody(next,block.start+raw.length+(block.start+raw.length===next.length-1?1:0),true);
+        }
       }
       return;
     }
