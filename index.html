@@ -1306,7 +1306,7 @@ function ensureCaretVisible() {
 /* ---------- serialization ---------- */
 function serializeDoc() {
   return blockEls().map((b) => {
-    if (b.classList.contains('math-block')) return b.dataset.raw || '';
+    if (b.classList.contains('math-block') || b.classList.contains('image-block')) return b.dataset.raw || '';
     const code = b.classList.contains('code');
     const t = blockText(b, code);
     return code ? t : t.replace(/\n+$/, '');
