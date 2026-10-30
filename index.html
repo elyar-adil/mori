@@ -219,6 +219,59 @@ body.dark{--bg:#191b19;--side:#20231f;--list-bg:#22251f;--paper:#252823;--ink:#e
 .context-menu hr{border:0;border-top:1px solid var(--line);margin:4px 3px}
 .blk.quote{border-left-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
 
+
+/* Mori visual refinement */
+.brand-edition,.sidebar-version,.list-eyebrow{display:none!important}
+.sidebar,.note-sidebar{border-right:0!important}
+.sidebar{padding:24px 14px 14px}
+.sidebar-head{padding:0 8px 30px;min-height:34px}
+.nav-section-label{margin:0 0 10px;padding:0 11px}
+.nav-list{gap:4px}
+.nav-item{min-height:37px;padding:0 11px;border-radius:9px}
+.sidebar-bottom{border-top:0;padding:0 4px;margin-top:auto}
+.bottom-btn{width:36px;height:36px;padding:0;justify-content:center;border-radius:10px}
+.bottom-btn svg{width:17px;height:17px}
+.list-header{padding:27px 19px 15px}
+.list-heading-row{align-items:center;margin-bottom:15px}
+.list-heading-row h1{font-size:22px;letter-spacing:-.04em}
+.new-btn{display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;border-radius:10px;background:transparent;color:var(--muted);box-shadow:none}
+.new-btn:hover{background:var(--accent-soft);color:var(--accent);filter:none}
+.new-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.75}
+.list{padding:8px 11px 16px}
+.note-item{padding:11px 12px 12px;margin:3px 0;border-radius:10px}
+.note-item.active{background:var(--accent-soft)}
+.note-item.active::before{display:none}
+.note-item:hover:not(.active){background:color-mix(in srgb,var(--hover) 72%,transparent)}
+.note-title{font-size:13px;line-height:1.45}
+.note-excerpt{margin-top:4px;line-height:1.55}
+.note-date{margin-top:6px}
+.main{background:var(--paper)}
+.topbar{border-bottom:0;padding-inline:24px}
+.editor-toolbar{display:flex;align-items:center;gap:13px;flex-wrap:wrap;padding:4px 0 9px;margin:0 0 12px;border:0}
+.toolbar-group{display:flex;align-items:center;gap:3px}
+.toolbar-separator{display:none}
+.tool-btn{width:31px;height:30px;border-radius:8px;color:var(--muted);transition:background .12s ease,color .12s ease}
+.tool-btn:hover,.tool-btn:focus-visible{background:var(--hover);color:var(--ink)}
+.tool-btn:active{background:var(--accent-soft);color:var(--accent)}
+.tool-btn svg{width:16px;height:16px;stroke-width:1.65}
+.tool-btn.type-btn{font-size:14px}
+.tool-btn.heading-btn{width:32px;font-size:10px;font-weight:700;letter-spacing:-.02em}
+.title{margin-bottom:15px}
+@media(max-width:1120px) and (min-width:761px){
+  .sidebar{padding-inline:8px}
+  .sidebar-head{padding-bottom:30px}
+  .bottom-btn{width:36px;height:36px}
+}
+@media(max-width:760px){
+  .sidebar{padding:22px 12px 12px}
+  .sidebar-head{padding-bottom:28px}
+  .topbar{padding-inline:10px}
+  .editor-toolbar{gap:9px;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+  .editor-toolbar::-webkit-scrollbar{display:none}
+  .toolbar-group,.tool-btn{flex-shrink:0}
+  .list-header{padding-top:calc(22px + env(safe-area-inset-top))}
+}
+
 </style>
 </head>
 <body>
@@ -230,16 +283,18 @@ body.dark{--bg:#191b19;--side:#20231f;--list-bg:#22251f;--paper:#252823;--ink:#e
 <button class="nav-item" data-switch-view="today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg><span>最近编辑</span><span class="nav-count" id="nav-today-count"></span></button>
 <button class="nav-item" data-switch-view="favorites"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg><span>收藏</span><span class="nav-count" id="nav-favorites-count"></span></button>
 <button class="nav-item" id="trash-btn"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 4h6M7 7l1 13h8l1-13"/></svg><span id="trash-label">最近删除</span><span class="nav-count" id="trash-count"></span></button></nav>
-<div class="sidebar-bottom"><button class="bottom-btn" id="settings-btn" title="设置与外观"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 13.5 21 15l-2 3-2.4-1a8 8 0 0 1-2 1.2L14 21h-4l-.6-2.8a8 8 0 0 1-2-1.2L5 18l-2-3 2-1.5a8 8 0 0 1 0-2L3 10l2-3 2.4 1a8 8 0 0 1 2-1.2L10 4h4l.6 2.8a8 8 0 0 1 2 1.2L19 7l2 3-2 1.5a8 8 0 0 1 0 2Z"/></svg><span>设置与外观</span></button><span class="sidebar-version">LOCAL FIRST</span></div>
+<div class="sidebar-bottom"><button class="bottom-btn" id="settings-btn" title="设置" aria-label="设置"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 13.5 21 15l-2 3-2.4-1a8 8 0 0 1-2 1.2L14 21h-4l-.6-2.8a8 8 0 0 1-2-1.2L5 18l-2-3 2-1.5a8 8 0 0 1 0-2L3 10l2-3 2.4 1a8 8 0 0 1 2-1.2L10 4h4l.6 2.8a8 8 0 0 1 2 1.2L19 7l2 3-2 1.5a8 8 0 0 1 0 2Z"/></svg></button></div>
 </aside><div class="overlay" id="overlay"></div>
-<aside class="note-sidebar" id="note-sidebar"><header class="list-header"><div class="list-heading-row"><div><div class="list-eyebrow" id="list-eyebrow">你的空间</div><h1 id="list-title">所有笔记</h1></div><button class="new-btn" id="new-btn" title="新建笔记 (⌘N)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>新建</span></button></div>
+<aside class="note-sidebar" id="note-sidebar"><header class="list-header"><div class="list-heading-row"><div><div class="list-eyebrow" id="list-eyebrow">你的空间</div><h1 id="list-title">所有笔记</h1></div><button class="new-btn" id="new-btn" title="新建笔记 (⌘N)" aria-label="新建笔记"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
 <label class="search-wrap"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 4 4"/></svg><input class="search" id="search" placeholder="搜索笔记…" autocomplete="off" spellcheck="false"><kbd>⌘K</kbd></label></header>
 <div class="list" id="list"></div><footer class="list-footer"><span id="note-count">0 篇笔记</span><span class="sync-state"><i class="sync-dot" id="list-sync-dot"></i><span id="list-sync-label">仅保存在本机</span></span></footer></aside>
 <main class="main"><header class="topbar"><button class="icon-btn nav-toggle-btn" id="nav-btn" title="打开导航"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="icon-btn back-btn" id="back-btn" title="笔记列表"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h11M4 18h8"/></svg></button><span class="status" id="status">已保存</span><div class="spacer"></div><button class="icon-btn" id="sync-btn" title="同步 (⌘S)"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-13.6 5.7M4 12a8 8 0 0 1 13.6-5.7"/><path d="M20 4v5h-5M4 20v-5h5"/></svg></button><button class="icon-btn" id="star-btn" title="收藏"><svg viewBox="0 0 24 24"><path d="m12 3.5 2.7 5.5 6 .9-4.35 4.2 1.03 6L12 17.25 6.62 20.1l1.03-6L3.3 9.9l6-.9Z"/></svg></button><button class="icon-btn" id="more-btn" title="更多"><svg viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg></button></header>
 <div class="canvas" id="canvas"><div class="doc" id="doc"><textarea class="title" id="title" rows="1" placeholder="无标题" spellcheck="false"></textarea>
 <div class="editor-toolbar" id="editor-toolbar" role="toolbar" aria-label="格式工具栏">
-<div class="toolbar-group"><button type="button" class="tool-btn type-btn" data-format="bold" title="粗体"><b>B</b></button><button type="button" class="tool-btn type-btn italic-btn" data-format="italic" title="斜体"><i>I</i></button><button type="button" class="tool-btn strike-btn" data-format="strike" title="删除线">S̶</button><button type="button" class="tool-btn" data-format="code" title="行内代码"><svg viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></button><button type="button" class="tool-btn" data-format="link" title="插入链接"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.07 0l2-2A5 5 0 0 0 12 3.93l-1.14 1.14M14 11a5 5 0 0 0-7.07 0l-2 2A5 5 0 0 0 12 17.07l1.14-1.14"/></svg></button></div><span class="toolbar-separator"></span>
-<div class="toolbar-group"><button type="button" class="tool-btn heading-btn" data-block="h1">H1</button><button type="button" class="tool-btn heading-btn" data-block="h2">H2</button><button type="button" class="tool-btn" data-block="bullet" title="无序列表"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg></button><button type="button" class="tool-btn" data-block="ordered" title="有序列表"><svg viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h10M3 5h2v3M3 12h3l-3 3h3M3 18h3"/></svg></button><button type="button" class="tool-btn" data-block="quote" title="引用"><svg viewBox="0 0 24 24"><path d="M10 11H5v7h6v-7a5 5 0 0 0-5-5M20 11h-5v7h6v-7a5 5 0 0 0-5-5"/></svg></button><button type="button" class="tool-btn" data-block="task" title="待办"><svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="6" height="6" rx="1"/><path d="m5 7 1.4 1.4L9 5.7M13 7h7M3.5 15h6v6h-6zM13 18h7"/></svg></button></div></div>
+<div class="toolbar-group" role="group" aria-label="文字格式"><button type="button" class="tool-btn type-btn" data-format="bold" title="粗体" aria-label="粗体"><b>B</b></button><button type="button" class="tool-btn type-btn italic-btn" data-format="italic" title="斜体" aria-label="斜体"><i>I</i></button><button type="button" class="tool-btn strike-btn" data-format="strike" title="删除线" aria-label="删除线">S̶</button><button type="button" class="tool-btn" data-format="link" title="插入链接" aria-label="插入链接"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.07 0l2-2A5 5 0 0 0 12 3.93l-1.14 1.14M14 11a5 5 0 0 0-7.07 0l-2 2A5 5 0 0 0 12 17.07l1.14-1.14"/></svg></button><button type="button" class="tool-btn" data-format="code" title="行内代码" aria-label="行内代码"><svg viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></button></div>
+<div class="toolbar-group" role="group" aria-label="标题"><button type="button" class="tool-btn heading-btn" data-block="h1" title="一级标题" aria-label="一级标题">H1</button><button type="button" class="tool-btn heading-btn" data-block="h2" title="二级标题" aria-label="二级标题">H2</button></div>
+<div class="toolbar-group" role="group" aria-label="列表"><button type="button" class="tool-btn" data-block="bullet" title="无序列表" aria-label="无序列表"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg></button><button type="button" class="tool-btn" data-block="ordered" title="有序列表" aria-label="有序列表"><svg viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h10M3 5h2v3M3 12h3l-3 3h3M3 18h3"/></svg></button><button type="button" class="tool-btn" data-block="task" title="待办" aria-label="待办"><svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="6" height="6" rx="1"/><path d="m5 7 1.4 1.4L9 5.7M13 7h7M3.5 15h6v6h-6zM13 18h7"/></svg></button></div>
+<div class="toolbar-group" role="group" aria-label="引用"><button type="button" class="tool-btn" data-block="quote" title="引用" aria-label="引用"><svg viewBox="0 0 24 24"><path d="M10 11H5v7h6v-7a5 5 0 0 0-5-5M20 11h-5v7h6v-7a5 5 0 0 0-5-5"/></svg></button></div></div>
 <div class="editor" id="editor" contenteditable="true" spellcheck="false" role="textbox" aria-multiline="true"></div></div><div class="doc-empty" id="empty" hidden><span class="empty-icon-frame"><img id="empty-icon" alt="" draggable="false"></span><h2>没有打开的笔记</h2><p>从列表选择一篇笔记，或者新建一个想法。</p><button class="btn" id="empty-new" type="button">新建笔记</button></div></div></main></div><div id="modal-root"></div>
 <div class="toast" id="toast"></div>
 <input type="file" id="import-file" accept=".md,.markdown,.txt,text/markdown,text/plain" hidden>
