@@ -521,6 +521,38 @@ u{text-decoration-thickness:1px;text-underline-offset:3px}
 }
 .blk.image-block.active img{outline:1px solid var(--line);outline-offset:2px}
 
+
+/* Formula editor */
+.math-editor-modal{width:min(620px,100%);padding:22px 24px 20px}
+.math-editor-subtitle{margin:4px 0 0;font-size:11px;color:var(--muted)}
+.math-snippets{display:flex;flex-wrap:wrap;gap:5px;margin:16px 0 12px}
+.math-snippets button{height:27px;padding:0 9px;border:1px solid var(--line);border-radius:7px;background:var(--side);color:var(--muted);font:500 10.5px var(--ui)}
+.math-snippets button:hover{background:var(--hover);color:var(--ink)}
+.math-source{display:block;width:100%;min-height:104px;resize:vertical;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);padding:11px 12px;font:13px/1.65 var(--mono);outline:none}
+.math-source:focus{border-color:var(--accent);background:var(--paper)}
+.math-preview-label{margin:14px 0 6px;font:600 10px var(--ui);color:var(--muted)}
+.math-live-preview{display:flex;align-items:center;justify-content:center;min-height:105px;max-height:230px;overflow:auto;padding:18px 12px;border:1px solid var(--line);border-radius:9px;background:var(--side);color:var(--ink)}
+.math-live-preview math{font:1.45em var(--serif);max-width:100%}
+.math-preview-empty{font-size:11px;color:var(--faint)}
+/* Image deletion affordance */
+.blk.image-block{position:relative;outline:1px solid transparent;outline-offset:3px;transition:outline-color .12s ease}
+.blk.image-block:hover,.blk.image-block.is-selected,.blk.image-block:focus-visible{outline-color:var(--accent)}
+.blk.image-block .image-delete{
+  position:absolute;top:9px;right:9px;display:inline-flex;align-items:center;gap:5px;
+  height:29px;padding:0 9px;border:1px solid var(--line);border-radius:7px;
+  background:color-mix(in srgb,var(--paper) 94%,transparent);color:var(--muted);
+  box-shadow:0 2px 8px rgba(30,30,24,.12);font:550 10.5px var(--ui);
+  opacity:0;pointer-events:none;transition:opacity .12s ease,color .12s ease,background .12s ease;
+}
+.blk.image-block:hover .image-delete,.blk.image-block.is-selected .image-delete,.blk.image-block:focus-within .image-delete{opacity:1;pointer-events:auto}
+.blk.image-block .image-delete svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.blk.image-block .image-delete:hover{background:var(--paper);color:var(--danger)}
+@media(max-width:760px){
+  .math-editor-modal{width:100%;padding:18px 16px}
+  .math-live-preview{min-height:88px}
+  .blk.image-block .image-delete{opacity:1;pointer-events:auto}
+}
+
 </style>
 </head>
 <body>
@@ -1052,8 +1084,9 @@ function renderBlock(b, active, index) {
   if (b.type === 'image') {
     const image = parseImageMarkdown(b.raw);
     if (!image) return '<div class="' + cls + '"' + attrs + '>' + escapeHtml(b.raw) + '</div>';
-    return '<div class="' + cls + ' image-block" contenteditable="false"' + attrs + ' data-raw="' + escapeHtml(b.raw) + '">' +
+    return '<div class="' + cls + ' image-block" contenteditable="false" tabindex="0" role="group" aria-label="图片：' + escapeHtml(image.alt || '未命名') + '"' + attrs + ' data-raw="' + escapeHtml(b.raw) + '">' +
       '<img src="' + escapeHtml(image.src) + '" alt="' + escapeHtml(image.alt) + '" loading="lazy" draggable="false">' +
+      '<button type="button" class="image-delete" data-delete-image title="删除图片" aria-label="删除图片"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg><span>删除</span></button>' +
       '</div>';
   }
   if (b.type === 'code') {
@@ -1763,6 +1796,97 @@ async function insertImageFile(file, bookmark) {
   }
 }
 
+function renderMathPreview(source) {
+  const preview = $('math-live-preview');
+  if (!preview) return;
+  const value = String(source || '').trim();
+  preview.innerHTML = value
+    ? '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">' + latexToMathML(value) + '</math>'
+    : '<span class="math-preview-empty">输入 LaTeX 后，这里会显示公式预览</span>';
+}
+
+function openMathEditor(options) {
+  const opts = options || {};
+  const isEdit = opts.mode === 'edit';
+  const note = currentNote();
+  if (!note) return;
+  const noteId = note.id;
+  const initial = isEdit ? mathExpression(opts.raw || '') : '';
+  const startRange = isEdit ? null : (selectionOffsets() || (() => {
+    const caret = caretOffset();
+    return {start:caret == null ? (note.body || '').length : caret,end:caret == null ? (note.body || '').length : caret};
+  })());
+  const html =
+    '<section class="modal math-editor-modal" role="dialog" aria-modal="true" aria-labelledby="math-editor-title">' +
+      '<header class="modal-head"><div><h2 id="math-editor-title">'+(isEdit?'编辑公式':'插入公式')+'</h2><p class="math-editor-subtitle">使用 LaTeX 编写，预览会实时更新</p></div><button class="modal-close" data-close aria-label="关闭"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header>' +
+      '<div class="math-snippets" aria-label="常用公式">' +
+        '<button type="button" data-math-snippet="\\\\frac{}{ }" data-caret-back="3">分数</button>' +
+        '<button type="button" data-math-snippet="\\\\sqrt{}" data-caret-back="1">根号</button>' +
+        '<button type="button" data-math-snippet="x_{i}" data-caret-back="1">下标</button>' +
+        '<button type="button" data-math-snippet="x^{2}" data-caret-back="1">上标</button>' +
+        '<button type="button" data-math-snippet="\\\\alpha">α</button>' +
+        '<button type="button" data-math-snippet="\\\\sum_{i=1}^{n}">求和</button>' +
+        '<button type="button" data-math-snippet="\\\\int_{a}^{b}">积分</button>' +
+      '</div>' +
+      '<label class="field-label" for="math-source">LaTeX</label>' +
+      '<textarea id="math-source" class="math-source" spellcheck="false" rows="4" placeholder="例如：\\\\frac{a}{b} = c">'+escapeHtml(initial)+'</textarea>' +
+      '<div class="math-preview-label">预览</div><div id="math-live-preview" class="math-live-preview"></div>' +
+      '<div class="modal-actions"><button type="button" class="btn ghost" data-close>取消</button><button type="button" class="btn primary" id="math-save">保存公式</button></div>' +
+    '</section>';
+  openModal(html);
+  const source = $('math-source');
+  const update = () => renderMathPreview(source.value);
+  source.addEventListener('input', update);
+  source.addEventListener('keydown', (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+      event.preventDefault();
+      $('math-save').click();
+    }
+  });
+  $('modal-root').querySelectorAll('[data-math-snippet]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const snippet = button.dataset.mathSnippet || '';
+      const start = source.selectionStart == null ? source.value.length : source.selectionStart;
+      const end = source.selectionEnd == null ? start : source.selectionEnd;
+      source.setRangeText(snippet,start,end,'end');
+      const back = Number(button.dataset.caretBack || 0);
+      if (back) source.setSelectionRange(Math.max(start+snippet.length-back,start),Math.max(start+snippet.length-back,start));
+      source.focus();
+      update();
+    });
+  });
+  $('math-save').addEventListener('click', () => {
+    const expression = source.value.trim();
+    if (!expression) { source.focus(); toast('先输入公式内容'); return; }
+    const activeNote = currentNote();
+    if (!activeNote || activeNote.id !== noteId) { closeModal(); toast('笔记已切换，请重新编辑公式'); return; }
+    const markdown = '$$\n' + expression + '\n$$';
+    let next, caret;
+    if (isEdit) {
+      const body = activeNote.body || '';
+      const currentBlock = splitBlocks(body).find((block) => block.start === opts.start && block.type === 'math');
+      if (!currentBlock || currentBlock.raw !== opts.raw) { closeModal(); toast('公式内容已变化，请重新打开编辑'); return; }
+      next = body.slice(0,currentBlock.start) + markdown + body.slice(currentBlock.start+currentBlock.raw.length);
+      caret = currentBlock.start + markdown.length;
+    } else {
+      const body = activeNote.body || '';
+      const from = Math.max(0,Math.min(body.length,startRange.start));
+      const to = Math.max(from,Math.min(body.length,startRange.end));
+      const before = body.slice(0,from), after = body.slice(to);
+      const lead = before && !before.endsWith('\n') ? '\n\n' : '';
+      const tail = after && !after.startsWith('\n') ? '\n\n' : '';
+      next = before + lead + markdown + tail + after;
+      caret = from + lead.length + markdown.length;
+    }
+    closeModal();
+    focusEditor();
+    applyBody(next,caret,true);
+    ensureCaretVisible();
+  });
+  update();
+  source.focus();
+}
+
 function bindToolbar() {
   $('editor-toolbar').querySelectorAll('button').forEach((button) => {
     button.addEventListener('mousedown', (e) => e.preventDefault());
@@ -1778,7 +1902,7 @@ function bindToolbar() {
       else if(insert==='codeblock')insertBlockTemplate('\`\`\`\n\n\`\`\`',4);
       else if(insert==='hr')insertBlockTemplate('---',3);
       else if(insert==='table')insertBlockTemplate('| 标题 1 | 标题 2 |\n| --- | --- |\n| 内容 | 内容 |',2);
-      else if(insert==='math')insertBlockTemplate('$$\n\\frac{a}{b} = c\n$$\n',22);
+      else if(insert==='math') { openMathEditor({mode:'insert'}); return; }
       else if(insert==='image') {
         pendingImageBookmark = captureImageBookmark();
         $('image-file').click();
@@ -2533,6 +2657,21 @@ async function forgetToken() {
 }
 
 /* ---------- bind ---------- */
+function deleteImageBlock(block) {
+  const note = currentNote();
+  if (!note || !block || !block.classList.contains('image-block')) return;
+  const index = Number(block.dataset.i);
+  const parsed = splitBlocks(note.body || '')[index];
+  if (!parsed || parsed.type !== 'image') return;
+  const md = note.body || '';
+  let start = parsed.start;
+  let end = parsed.start + parsed.raw.length;
+  if (md[end] === '\n') end++;
+  else if (start > 0 && md[start - 1] === '\n') start--;
+  applyBody(md.slice(0,start) + md.slice(end), Math.min(start,md.length), true);
+  toast('图片已删除');
+}
+
 function readTableWidget(table) {
   const rows = [];
   const header = table.querySelector('thead tr');
@@ -2850,19 +2989,25 @@ function bind() {
   });
 
   editor.addEventListener('click', (e) => {
+    const imageDelete = e.target.closest && e.target.closest('[data-delete-image]');
+    if (imageDelete) {
+      e.preventDefault();
+      e.stopPropagation();
+      deleteImageBlock(imageDelete.closest('.image-block'));
+      return;
+    }
+    const imageBlock = e.target.closest && e.target.closest('.image-block');
+    if (imageBlock) {
+      editor.querySelectorAll('.image-block.is-selected').forEach((el) => el.classList.remove('is-selected'));
+      imageBlock.classList.add('is-selected');
+      imageBlock.focus({preventScroll:true});
+      return;
+    }
     const mathBlock=e.target.closest&&e.target.closest('.math-block');
     if(mathBlock){
       e.preventDefault();
-      const note=currentNote(),blocks=splitBlocks(note?note.body||'':''),block=blocks[Number(mathBlock.dataset.i)];
-      if(block&&block.type==='math'){
-        const edited=window.prompt('编辑 LaTeX 公式',mathExpression(block.raw));
-        if(edited!=null){
-          const raw='$$\n'+edited+'\n$$',body=note.body||'';
-          let next=body.slice(0,block.start)+raw+body.slice(block.start+block.raw.length);
-          if(block.start+raw.length===next.length)next+='\n';
-          applyBody(next,block.start+raw.length+(block.start+raw.length===next.length-1?1:0),true);
-        }
-      }
+      const note=currentNote(),block=splitBlocks(note?note.body||'':'')[Number(mathBlock.dataset.i)];
+      if(block&&block.type==='math')openMathEditor({mode:'edit',noteId:note.id,start:block.start,raw:block.raw});
       return;
     }
     const box = e.target.closest && e.target.closest('.taskbox');
@@ -2879,6 +3024,13 @@ function bind() {
   });
 
   editor.addEventListener('keydown', (e) => {
+    const imageBlock = e.target.closest && e.target.closest('.image-block');
+    if (imageBlock && (e.key === 'Backspace' || e.key === 'Delete')) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      deleteImageBlock(imageBlock);
+      return;
+    }
     const mod = e.metaKey || e.ctrlKey;
     if (e.key === 'Tab') {
       e.preventDefault();
