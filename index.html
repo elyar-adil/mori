@@ -1820,16 +1820,16 @@ function openMathEditor(options) {
     '<section class="modal math-editor-modal" role="dialog" aria-modal="true" aria-labelledby="math-editor-title">' +
       '<header class="modal-head"><div><h2 id="math-editor-title">'+(isEdit?'编辑公式':'插入公式')+'</h2><p class="math-editor-subtitle">使用 LaTeX 编写，预览会实时更新</p></div><button class="modal-close" data-close aria-label="关闭"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header>' +
       '<div class="math-snippets" aria-label="常用公式">' +
-        '<button type="button" data-math-snippet="\\\\frac{}{ }" data-caret-back="3">分数</button>' +
-        '<button type="button" data-math-snippet="\\\\sqrt{}" data-caret-back="1">根号</button>' +
+        '<button type="button" data-math-snippet="\frac{}{}" data-caret-back="3">分数</button>' +
+        '<button type="button" data-math-snippet="\sqrt{}" data-caret-back="1">根号</button>' +
         '<button type="button" data-math-snippet="x_{i}" data-caret-back="1">下标</button>' +
         '<button type="button" data-math-snippet="x^{2}" data-caret-back="1">上标</button>' +
-        '<button type="button" data-math-snippet="\\\\alpha">α</button>' +
-        '<button type="button" data-math-snippet="\\\\sum_{i=1}^{n}">求和</button>' +
-        '<button type="button" data-math-snippet="\\\\int_{a}^{b}">积分</button>' +
+        '<button type="button" data-math-snippet="\alpha">α</button>' +
+        '<button type="button" data-math-snippet="\sum_{i=1}^{n}">求和</button>' +
+        '<button type="button" data-math-snippet="\int_{a}^{b}">积分</button>' +
       '</div>' +
       '<label class="field-label" for="math-source">LaTeX</label>' +
-      '<textarea id="math-source" class="math-source" spellcheck="false" rows="4" placeholder="例如：\\\\frac{a}{b} = c">'+escapeHtml(initial)+'</textarea>' +
+      '<textarea id="math-source" class="math-source" spellcheck="false" rows="4" placeholder="例如：\frac{a}{b} = c">'+escapeHtml(initial)+'</textarea>' +
       '<div class="math-preview-label">预览</div><div id="math-live-preview" class="math-live-preview"></div>' +
       '<div class="modal-actions"><button type="button" class="btn ghost" data-close>取消</button><button type="button" class="btn primary" id="math-save">保存公式</button></div>' +
     '</section>';
