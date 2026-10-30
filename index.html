@@ -383,6 +383,24 @@ body.dark{--bg:#191b19;--side:#20231f;--list-bg:#22251f;--paper:#252823;--ink:#e
 u{text-decoration-thickness:1px;text-underline-offset:3px}
 @media(max-width:760px){.editor-toolbar{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:6px;padding:3px 0 10px;scrollbar-width:none}.editor-toolbar::-webkit-scrollbar{display:none}.editor-toolbar .toolbar-group{flex:0 0 auto}}
 
+
+/* Table and formula block presentation */
+.blk.table{display:block;margin:12px 0 16px;padding:5px 0;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:color-mix(in srgb,var(--paper) 90%,var(--side))}
+.blk.table .table-row{display:grid;min-height:34px;align-items:stretch;border-bottom:1px solid color-mix(in srgb,var(--line) 76%,transparent)}
+.blk.table .table-row:last-of-type{border-bottom:0}
+.blk.table .table-head{font-family:var(--ui);font-weight:650;background:color-mix(in srgb,var(--accent-soft) 42%,transparent)}
+.blk.table .table-cell{display:flex;align-items:center;min-width:0;padding:7px 10px;white-space:pre-wrap;overflow-wrap:anywhere;border-right:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
+.blk.table .table-cell:last-of-type{border-right:0}
+.blk.table .table-rule{display:none}
+.blk.table .mk{display:none!important}
+.blk.math-block{margin:13px 0 17px;padding:17px 18px 11px;border:1px solid var(--line);border-radius:10px;background:color-mix(in srgb,var(--side) 56%,var(--paper));cursor:pointer;user-select:none;overflow-x:auto}
+.blk.math-block .math-preview{display:flex;justify-content:center;min-height:34px;align-items:center;color:var(--ink);font-size:1.2em}
+.blk.math-block math{font-family:var(--serif);font-size:1.12em;max-width:100%}
+.blk.math-block .math-caption{display:block;text-align:right;margin-top:8px;font:10px/1.4 var(--ui);color:var(--faint)}
+.blk.math-block:hover{border-color:color-mix(in srgb,var(--accent) 35%,var(--line))}
+u{text-decoration-thickness:1px;text-underline-offset:3px}
+@media(max-width:760px){.blk.table{overflow-x:auto}.blk.table .table-row{min-width:440px}}
+
 </style>
 </head>
 <body>
@@ -649,6 +667,46 @@ function blockType(line) {
   return 'p';
 }
 
+function latexToMathML(source) {
+  const greek={alpha:'α',beta:'β',gamma:'γ',delta:'δ',epsilon:'ε',theta:'θ',lambda:'λ',mu:'μ',pi:'π',rho:'ρ',sigma:'σ',phi:'φ',omega:'ω',Gamma:'Γ',Delta:'Δ',Theta:'Θ',Lambda:'Λ',Pi:'Π',Sigma:'Σ',Phi:'Φ',Omega:'Ω'};
+  const ops={times:'×',cdot:'·',div:'÷',pm:'±',leq:'≤',le:'≤',geq:'≥',ge:'≥',neq:'≠',approx:'≈',equiv:'≡',infty:'∞',sum:'∑',prod:'∏',int:'∫',to:'→',rightarrow:'→',leftarrow:'←',partial:'∂',nabla:'∇',forall:'∀',exists:'∃',in:'∈',notin:'∉',cup:'∪',cap:'∩',cdots:'⋯'};
+  const esc=v=>escapeHtml(v);let i=0;const input=String(source||'');
+  function group(){while(i<input.length&&/\s/.test(input[i]))i++;if(input[i]==='{'){i++;const v=sequence('}');if(input[i]==='}')i++;return '<mrow>'+v+'</mrow>';}return atom();}
+  function atom(){
+    while(i<input.length&&/\s/.test(input[i]))i++;if(i>=input.length)return '<mrow></mrow>';
+    let value='',ch=input[i];
+    if(ch==='\\'){i++;const start=i;while(i<input.length&&/[A-Za-z]/.test(input[i]))i++;const cmd=input.slice(start,i);
+      if(!cmd&&i<input.length)value='<mo>'+esc(input[i++])+'</mo>';
+      else if(cmd==='frac'){const a=group(),b=group();value='<mfrac>'+a+b+'</mfrac>';}
+      else if(cmd==='sqrt')value='<msqrt>'+group()+'</msqrt>';
+      else if(cmd==='text'||cmd==='mathrm'||cmd==='mathbf')value='<mstyle mathvariant="'+(cmd==='mathbf'?'bold':'normal')+'">'+group()+'</mstyle>';
+      else if(greek[cmd])value='<mi>'+greek[cmd]+'</mi>';
+      else if(ops[cmd])value='<mo>'+ops[cmd]+'</mo>';
+      else if(['left','right','displaystyle','textstyle','quad','qquad',',',';','!'].includes(cmd))value='';
+      else value='<mi>'+esc(cmd)+'</mi>';
+    }else if(ch==='{')value=group();
+    else if(/[0-9]/.test(ch)){const m=input.slice(i).match(/^\d+(?:\.\d+)?/)[0];i+=m.length;value='<mn>'+m+'</mn>';}
+    else if(/[A-Za-z]/.test(ch)){const m=input.slice(i).match(/^[A-Za-z]+/)[0];i+=m.length;value='<mi>'+esc(m)+'</mi>';}
+    else{i++;value=ch===' '?' <mspace width="0.25em"/>':'<mo>'+esc(ch)+'</mo>';}
+    let sub='',sup='';while(input[i]==='_'||input[i]==='^'){const k=input[i++],v=group();if(k==='_')sub=v;else sup=v;}
+    if(sub&&sup)value='<msubsup>'+value+sub+sup+'</msubsup>';else if(sub)value='<msub>'+value+sub+'</msub>';else if(sup)value='<msup>'+value+sup+'</msup>';return value;
+  }
+  function sequence(stop){const out=[];while(i<input.length&&input[i]!==stop){const before=i;out.push(atom());if(i===before)i++;}return out.join('');}
+  return sequence('');
+}
+function mathExpression(raw){const lines=String(raw||'').split('\n');if(lines.length&&/^\s*\$\$\s*$/.test(lines[0]))lines.shift();if(lines.length&&/^\s*\$\$\s*$/.test(lines[lines.length-1]))lines.pop();return lines.join('\n').trim();}
+function isTableLine(line){return /^\s*\|.*\|\s*$/.test(line)&&(line.match(/\|/g)||[]).length>=3;}
+function renderTableBlock(b,active,index){
+  const lines=b.raw.split('\n'),parsed=lines.map(line=>{const m=line.match(/^(\s*)\|(.*)\|(\s*)$/);return m?{lead:m[1],cells:m[2].split('|'),trail:m[3]}:{lead:'',cells:[line],trail:''};});
+  const cols=Math.max(1,...parsed.map(r=>r.cells.length)),rows=parsed.map((r,ri)=>{
+    if(r.cells.every(c=>/^\s*:?-{3,}:?\s*$/.test(c)))return '<div class="table-rule" contenteditable="false"><span class="mk">'+escapeHtml(lines[ri])+'</span></div>';
+    let html='<span class="mk">'+escapeHtml(r.lead+'|')+'</span>';
+    r.cells.forEach(c=>{html+='<span class="table-cell">'+escapeHtml(c)+'</span><span class="mk">|</span>';});
+    html+='<span class="mk">'+escapeHtml(r.trail)+'</span>';
+    return '<div class="table-row'+(ri===0?' table-head':'')+'" style="grid-template-columns:repeat('+cols+',minmax(0,1fr))">'+html+'</div>';
+  }).join('');
+  return '<div class="blk table'+(active?' active':'')+'" data-i="'+index+'">'+rows+'</div>';
+}
 function splitBlocks(md) {
   const lines = md.split('\n');
   const blocks = [];
@@ -671,6 +729,15 @@ function splitBlocks(md) {
       off += raw.length + 1;
       i = end + 1;
       continue;
+    }
+    if (/^\s*\$\$\s*$/.test(line)) {
+      let j=i+1;while(j<lines.length&&!/^\s*\$\$\s*$/.test(lines[j]))j++;
+      const closed=j<lines.length,end=closed?j:lines.length-1,raw=lines.slice(i,end+1).join('\n');
+      blocks.push({raw,start:off,type:'math',closed});off+=raw.length+1;i=end+1;continue;
+    }
+    if (isTableLine(line)&&i+1<lines.length&&isTableLine(lines[i+1])) {
+      let j=i+1;while(j<lines.length&&isTableLine(lines[j]))j++;
+      const raw=lines.slice(i,j).join('\n');blocks.push({raw,start:off,type:'table'});off+=raw.length+1;i=j;continue;
     }
     blocks.push({ raw: line, start: off, type: blockType(line) });
     off += line.length + 1;
@@ -739,6 +806,11 @@ function inlineHtml(text) {
       i += m[0].length;
       continue;
     }
+    if ((m = rest.match(/^\+\+([^\n]+?)\+\+/))) {
+      out += '<u><span class="mk">++</span>' + inlineHtml(m[1]) + '<span class="mk">++</span></u>';
+      i += m[0].length;
+      continue;
+    }
     if ((m = rest.match(/^~~([^\n]+?)~~/))) {
       out += '<del><span class="mk">~~</span>' + inlineHtml(m[1]) + '<span class="mk">~~</span></del>';
       i += m[0].length;
@@ -769,6 +841,13 @@ function renderBlock(b, active, index) {
   const cls = 'blk ' + b.type + (active ? ' active' : '');
   const attrs = ' data-i="' + index + '"';
   if (b.type === 'blank') return '<div class="' + cls + '"' + attrs + '><br></div>';
+  if (b.type === 'table') return renderTableBlock(b, active, index);
+  if (b.type === 'math') {
+    const expr=mathExpression(b.raw);
+    return '<div class="' + cls + ' math-block" contenteditable="false"' + attrs + ' data-raw="' + escapeHtml(b.raw) + '">' +
+      '<div class="math-preview"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">' + latexToMathML(expr) + '</math></div>' +
+      '<span class="math-caption">公式 · 点击编辑 LaTeX</span></div>';
+  }
   if (b.type === 'code') {
     const lines = b.raw.split('\n');
     if (!b.closed) {
@@ -863,6 +942,9 @@ function textOffsetWithin(root, node, offset) {
   return acc;
 }
 
+function blockSourceText(el) {
+  return el && el.classList && el.classList.contains('math-block') ? (el.dataset.raw || '') : (el ? el.textContent : '');
+}
 function caretOffset() {
   const sel = window.getSelection();
   if (!sel || !sel.rangeCount) return null;
@@ -871,7 +953,7 @@ function caretOffset() {
   if (r.startContainer === editor) {
     let off = 0;
     const kids = Array.from(editor.childNodes).slice(0, r.startOffset);
-    for (const k of kids) off += k.textContent.length + 1;
+    for (const k of kids) off += blockSourceText(k).length + 1;
     return off;
   }
   let off = 0;
@@ -879,7 +961,7 @@ function caretOffset() {
     if (b === r.startContainer || b.contains(r.startContainer)) {
       return off + textOffsetWithin(b, r.startContainer, r.startOffset);
     }
-    off += b.textContent.length + 1;
+    off += blockSourceText(b).length + 1;
   }
   return off;
 }
@@ -959,13 +1041,13 @@ function mdOffset(node, offset) {
   if (node === editor) {
     let off = 0;
     const kids = Array.from(editor.childNodes).slice(0, offset);
-    for (const k of kids) off += k.textContent.length + 1;
+    for (const k of kids) off += blockSourceText(k).length + 1;
     return off;
   }
   let off = 0;
   for (const b of blockEls()) {
     if (b === node || b.contains(node)) return off + textOffsetWithin(b, node, offset);
-    off += b.textContent.length + 1;
+    off += blockSourceText(b).length + 1;
   }
   return null;
 }
@@ -994,6 +1076,7 @@ function ensureCaretVisible() {
 /* ---------- serialization ---------- */
 function serializeDoc() {
   return blockEls().map((b) => {
+    if (b.classList.contains('math-block')) return b.dataset.raw || '';
     const code = b.classList.contains('code');
     const t = blockText(b, code);
     return code ? t : t.replace(/\n+$/, '');
@@ -2107,6 +2190,16 @@ function bind() {
   });
 
   editor.addEventListener('click', (e) => {
+    const mathBlock=e.target.closest&&e.target.closest('.math-block');
+    if(mathBlock){
+      e.preventDefault();
+      const note=currentNote(),blocks=splitBlocks(note?note.body||'':''),block=blocks[Number(mathBlock.dataset.i)];
+      if(block&&block.type==='math'){
+        const edited=window.prompt('编辑 LaTeX 公式',mathExpression(block.raw));
+        if(edited!=null){const raw='$\n'+edited+'\n$',body=note.body||'';applyBody(body.slice(0,block.start)+raw+body.slice(block.start+block.raw.length),block.start+3+edited.length,true);}
+      }
+      return;
+    }
     const box = e.target.closest && e.target.closest('.taskbox');
     if (box) {
       e.preventDefault();
