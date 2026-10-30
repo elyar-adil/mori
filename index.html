@@ -1075,7 +1075,10 @@ function updateToolbarState() {
   const lastIndex = lastPoint == null || !blocks.length ? firstIndex : blockIndexAt(blocks, lastPoint);
   const sameBlock = firstIndex >= 0 && firstIndex === lastIndex;
   const block = sameBlock ? blocks[firstIndex] : null;
-  const unsupportedBlock = !block || ['code','math','table','hr','image'].includes(block.type);
+  const selectedBlocks = firstIndex >= 0 && lastIndex >= firstIndex ? blocks.slice(firstIndex, lastIndex + 1) : [];
+  const supportedBlockTypes = (type) => type === 'blank' || type === 'p' || /^h[1-6]$/.test(type) || ['bullet','ordered','task','quote'].includes(type);
+  const supportedSelection = selectedBlocks.length > 0 && selectedBlocks.every((item) => supportedBlockTypes(item.type));
+  const unsupportedBlock = !supportedSelection;
   const start = sel ? sel.start : point;
   const end = sel ? sel.end : point;
   const sameLine = start == null || end == null || md.slice(start, end).indexOf('\n') < 0;
@@ -1094,9 +1097,13 @@ function updateToolbarState() {
   }
 
   const blockKinds = new Set();
-  if (block) {
-    if (/^h[1-6]$/.test(block.type)) blockKinds.add(block.type);
-    if (['bullet','ordered','task','quote'].includes(block.type)) blockKinds.add(block.type);
+  if (supportedSelection) {
+    const types = new Set(selectedBlocks.map((item) => item.type));
+    if (types.size === 1) {
+      const type = selectedBlocks[0].type;
+      if (/^h[1-6]$/.test(type)) blockKinds.add(type);
+      if (['bullet','ordered','task','quote'].includes(type)) blockKinds.add(type);
+    }
   }
   const canEdit = !!note && focused;
   toolbar.querySelectorAll('.tool-btn').forEach((button) => {
@@ -1104,7 +1111,7 @@ function updateToolbarState() {
     const kind = button.dataset.block;
     const isBlockTool = !!kind;
     const isInlineTool = !!format;
-    const enabled = canEdit && !unsupportedBlock && (isBlockTool ? sameBlock : isInlineTool ? sameLine : true);
+    const enabled = canEdit && supportedSelection && (!isInlineTool || sameLine);
     const active = format ? !!inlineActive[format] : kind ? blockKinds.has(kind) : false;
     button.disabled = !enabled;
     button.classList.toggle('is-active', active);
