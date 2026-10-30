@@ -1324,7 +1324,7 @@ function bindToolbar() {
       else if(insert==='codeblock')insertBlockTemplate('\`\`\`\n\n\`\`\`',4);
       else if(insert==='hr')insertBlockTemplate('---',3);
       else if(insert==='table')insertBlockTemplate('| 标题 1 | 标题 2 |\n| --- | --- |\n| 内容 | 内容 |',2);
-      else if(insert==='math')insertBlockTemplate('$\n\\frac{a}{b} = c\n$\n',21);
+      else if(insert==='math')insertBlockTemplate('$$\n\\frac{a}{b} = c\n$$\n',22);
       focusEditor();
     });
   });
@@ -2207,7 +2207,7 @@ function bind() {
       if(block&&block.type==='math'){
         const edited=window.prompt('编辑 LaTeX 公式',mathExpression(block.raw));
         if(edited!=null){
-          const raw='$\n'+edited+'\n$',body=note.body||'';
+          const raw='$$\n'+edited+'\n$$',body=note.body||'';
           let next=body.slice(0,block.start)+raw+body.slice(block.start+block.raw.length);
           if(block.start+raw.length===next.length)next+='\n';
           applyBody(next,block.start+raw.length+(block.start+raw.length===next.length-1?1:0),true);
