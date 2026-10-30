@@ -1479,6 +1479,18 @@ function handleBackspace() {
   if (sel && sel.start !== sel.end) { deleteRange(sel.start, sel.end); return true; }
   const caret = selectionOffsets() ? selectionOffsets().start : md.length;
   if (caret <= 0) return false;
+  const blocks = splitBlocks(md);
+  const at = blockIndexAt(blocks, caret);
+  const candidates = [blocks[at], blocks[at - 1]].filter(Boolean);
+  const adjacentImage = candidates.find((block) => block.type === 'image' && caret >= block.start + block.raw.length && caret <= block.start + block.raw.length + 1);
+  if (adjacentImage) {
+    let start = adjacentImage.start;
+    let end = adjacentImage.start + adjacentImage.raw.length;
+    if (md[end] === '\n') end++;
+    else if (start > 0 && md[start - 1] === '\n') start--;
+    applyBody(md.slice(0, start) + md.slice(end), start, true);
+    return true;
+  }
   if (md[caret - 1] === '\n') { applyBody(md.slice(0, caret - 1) + md.slice(caret), caret - 1, true); return true; }
   const marker = markerAtLineStart(md, caret);
   if (marker) { applyBody(md.slice(0, marker.start) + md.slice(marker.end), marker.start, true); return true; }
@@ -1574,6 +1586,15 @@ function insertBlockTemplate(template,focusWithin) {
   const before=md.slice(0,start),after=md.slice(end),lead=before&&!before.endsWith('\n')?'\n\n':'',tail=after&&!after.startsWith('\n')?'\n\n':'';
   applyBody(before+lead+template+tail+after,start+lead.length+(typeof focusWithin==='number'?focusWithin:template.length),true);ensureCaretVisible();
 }
+let pendingImageBookmark = null;
+
+function captureImageBookmark() {
+  const range = selectionOffsets();
+  if (range) return { start:range.start, end:range.end };
+  const caret = caretOffset();
+  return caret == null ? null : { start:caret, end:caret };
+}
+
 function blobAsDataUrl(blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -1621,12 +1642,28 @@ async function compressImageFile(file) {
   throw new Error('图片压缩后仍然太大，请换一张较小的图片。');
 }
 
-async function insertImageFile(file) {
+async function insertImageFile(file, bookmark) {
   try {
     const src = await compressImageFile(file);
     const alt = String(file.name || '图片').replace(/\.[^.]+$/, '').replace(/[\[\]\r\n]/g, ' ').trim() || '图片';
     const markdown = '![' + alt + '](' + src + ')';
-    insertBlockTemplate(markdown, markdown.length);
+    const note = currentNote();
+    if (!note) throw new Error('请先打开一篇笔记。');
+    const md = note.body || '';
+    const range = bookmark || captureImageBookmark() || { start:md.length, end:md.length };
+    const start = Math.max(0, Math.min(md.length, range.start));
+    const end = Math.max(start, Math.min(md.length, range.end));
+    if (md.length - (end - start) + markdown.length > 700 * 1024) {
+      throw new Error('这篇笔记的内容已接近 GitHub 同步大小限制，请移除一些图片后再插入。');
+    }
+    const before = md.slice(0, start);
+    const after = md.slice(end);
+    const lead = before && !before.endsWith('\n') ? '\n\n' : '';
+    const tail = after && !after.startsWith('\n') ? '\n\n' : '';
+    const next = before + lead + markdown + tail + after;
+    focusEditor();
+    applyBody(next, start + lead.length + markdown.length, true);
+    ensureCaretVisible();
     toast('图片已插入');
   } catch (error) {
     toast('图片插入失败：' + (error && error.message || '未知错误'));
@@ -1649,7 +1686,11 @@ function bindToolbar() {
       else if(insert==='hr')insertBlockTemplate('---',3);
       else if(insert==='table')insertBlockTemplate('| 标题 1 | 标题 2 |\n| --- | --- |\n| 内容 | 内容 |',2);
       else if(insert==='math')insertBlockTemplate('$$\n\\frac{a}{b} = c\n$$\n',22);
-      else if(insert==='image') { $('image-file').click(); return; }
+      else if(insert==='image') {
+        pendingImageBookmark = captureImageBookmark();
+        $('image-file').click();
+        return;
+      }
       focusEditor();
     });
   });
@@ -2455,7 +2496,9 @@ function bind() {
   $('image-file').addEventListener('change', (e) => {
     const file = e.target.files && e.target.files[0];
     e.target.value = '';
-    if (file) insertImageFile(file);
+    const bookmark = pendingImageBookmark;
+    pendingImageBookmark = null;
+    if (file) insertImageFile(file, bookmark);
   });
 
   titleEl.addEventListener('input', () => {
@@ -2529,7 +2572,7 @@ function bind() {
       const file = imageItem.getAsFile();
       if (file) {
         e.preventDefault();
-        insertImageFile(file);
+        insertImageFile(file, captureImageBookmark());
         return;
       }
     }
