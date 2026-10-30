@@ -370,6 +370,19 @@ body.dark{--bg:#191b19;--side:#20231f;--list-bg:#22251f;--paper:#252823;--ink:#e
   .editor-toolbar .toolbar-group{flex:0 0 auto}
 }
 
+
+/* Expanded writing tools */
+.editor-toolbar{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:7px 8px;overflow:visible;min-height:42px;padding:5px 0 11px;margin:0 0 15px;border:0!important}
+.editor-toolbar .toolbar-group{display:flex;align-items:center;gap:2px;padding:3px;border:1px solid color-mix(in srgb,var(--line) 82%,transparent);border-radius:10px;background:color-mix(in srgb,var(--side) 62%,var(--paper));box-shadow:0 1px 2px rgba(40,42,32,.035);flex-shrink:0}
+.editor-toolbar .tool-btn{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;padding:0;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--muted);line-height:1;transition:background .13s ease,border-color .13s ease,color .13s ease,box-shadow .13s ease}
+.editor-toolbar .tool-btn svg{display:block;width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.editor-toolbar .tool-btn:hover{background:var(--paper);border-color:var(--line);color:var(--ink);box-shadow:0 1px 2px rgba(30,32,24,.07)}
+.editor-toolbar .tool-btn:active{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 25%,var(--line));color:var(--accent);box-shadow:none}
+.editor-toolbar .tool-btn.heading-btn{flex-basis:29px;width:29px;font:700 9.5px/1 var(--ui);letter-spacing:-.05em}
+.editor-toolbar .tool-btn:focus-visible{outline:2px solid color-mix(in srgb,var(--accent) 55%,transparent);outline-offset:1px}
+u{text-decoration-thickness:1px;text-underline-offset:3px}
+@media(max-width:760px){.editor-toolbar{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:6px;padding:3px 0 10px;scrollbar-width:none}.editor-toolbar::-webkit-scrollbar{display:none}.editor-toolbar .toolbar-group{flex:0 0 auto}}
+
 </style>
 </head>
 <body>
@@ -390,23 +403,29 @@ body.dark{--bg:#191b19;--side:#20231f;--list-bg:#22251f;--paper:#252823;--ink:#e
 <div class="canvas" id="canvas"><div class="doc" id="doc"><textarea class="title" id="title" rows="1" placeholder="无标题" spellcheck="false"></textarea>
 <div class="editor-toolbar" id="editor-toolbar" role="toolbar" aria-label="格式工具栏">
 <div class="toolbar-group" role="group" aria-label="文字格式">
-<button type="button" class="tool-btn" data-format="bold" title="粗体" aria-label="粗体"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h6.5a3.5 3.5 0 0 1 0 7H7zM7 12h7.5a3.5 3.5 0 0 1 0 7H7z"/></svg></button>
-<button type="button" class="tool-btn" data-format="italic" title="斜体" aria-label="斜体"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6M4 20h6M15 4 9 20"/></svg></button>
-<button type="button" class="tool-btn" data-format="strike" title="删除线" aria-label="删除线"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 7.5C8 5.3 9.7 4 12 4c2.5 0 4.4 1.2 4.8 3.2M5 12h14M8 16c.7 2.5 2.3 4 4.7 4 2.4 0 4.2-1.1 4.8-3"/></svg></button>
-<button type="button" class="tool-btn" data-format="link" title="插入链接" aria-label="插入链接"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l2-2A5 5 0 0 0 12 3.93l-1.14 1.14M14 11a5 5 0 0 0-7.07 0l-2 2A5 5 0 0 0 12 17.07l1.14-1.14"/></svg></button>
-<button type="button" class="tool-btn" data-format="code" title="行内代码" aria-label="行内代码"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></button>
+<button type="button" class="tool-btn" data-format="bold" title="粗体" aria-label="粗体"><svg viewBox="0 0 24 24"><path d="M7 5h6.5a3.5 3.5 0 0 1 0 7H7zM7 12h7.5a3.5 3.5 0 0 1 0 7H7z"/></svg></button>
+<button type="button" class="tool-btn" data-format="italic" title="斜体" aria-label="斜体"><svg viewBox="0 0 24 24"><path d="M14 4h6M4 20h6M15 4 9 20"/></svg></button>
+<button type="button" class="tool-btn" data-format="underline" title="下划线" aria-label="下划线"><svg viewBox="0 0 24 24"><path d="M6 4v6a6 6 0 0 0 12 0V4M4 21h16"/></svg></button>
+<button type="button" class="tool-btn" data-format="strike" title="删除线" aria-label="删除线"><svg viewBox="0 0 24 24"><path d="M7.5 7.5C8 5.3 9.7 4 12 4c2.5 0 4.4 1.2 4.8 3.2M5 12h14M8 16c.7 2.5 2.3 4 4.7 4 2.4 0 4.2-1.1 4.8-3"/></svg></button>
+<button type="button" class="tool-btn" data-format="code" title="行内代码" aria-label="行内代码"><svg viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></button>
+<button type="button" class="tool-btn" data-format="link" title="插入链接" aria-label="插入链接"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.07 0l2-2A5 5 0 0 0 12 3.93l-1.14 1.14M14 11a5 5 0 0 0-7.07 0l-2 2A5 5 0 0 0 12 17.07l1.14-1.14"/></svg></button>
 </div>
-<div class="toolbar-group" role="group" aria-label="标题">
-<button type="button" class="tool-btn heading-btn" data-block="h1" title="一级标题" aria-label="一级标题">H1</button>
-<button type="button" class="tool-btn heading-btn" data-block="h2" title="二级标题" aria-label="二级标题">H2</button>
+<div class="toolbar-group" role="group" aria-label="标题级别">
+<button type="button" class="tool-btn heading-btn" data-block="h1" title="标题 1" aria-label="标题 1">H1</button><button type="button" class="tool-btn heading-btn" data-block="h2" title="标题 2" aria-label="标题 2">H2</button><button type="button" class="tool-btn heading-btn" data-block="h3" title="标题 3" aria-label="标题 3">H3</button><button type="button" class="tool-btn heading-btn" data-block="h4" title="标题 4" aria-label="标题 4">H4</button><button type="button" class="tool-btn heading-btn" data-block="h5" title="标题 5" aria-label="标题 5">H5</button><button type="button" class="tool-btn heading-btn" data-block="h6" title="标题 6" aria-label="标题 6">H6</button>
 </div>
 <div class="toolbar-group" role="group" aria-label="列表">
-<button type="button" class="tool-btn" data-block="bullet" title="无序列表" aria-label="无序列表"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg></button>
-<button type="button" class="tool-btn" data-block="ordered" title="有序列表" aria-label="有序列表"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10M3 5h2v3M3 12h3l-3 3h3M3 18h3"/></svg></button>
-<button type="button" class="tool-btn" data-block="task" title="待办" aria-label="待办"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="6" height="6" rx="1"/><path d="m5 7 1.4 1.4L9 5.7M13 7h7M3.5 15h6v6h-6zM13 18h7"/></svg></button>
+<button type="button" class="tool-btn" data-block="bullet" title="无序列表" aria-label="无序列表"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg></button>
+<button type="button" class="tool-btn" data-block="ordered" title="有序列表" aria-label="有序列表"><svg viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h10M3 5h2v3M3 12h3l-3 3h3M3 18h3"/></svg></button>
+<button type="button" class="tool-btn" data-block="task" title="待办清单" aria-label="待办清单"><svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="6" height="6" rx="1"/><path d="m5 7 1.4 1.4L9 5.7M13 7h7M3.5 15h6v6h-6zM13 18h7"/></svg></button>
 </div>
-<div class="toolbar-group" role="group" aria-label="引用">
-<button type="button" class="tool-btn" data-block="quote" title="引用" aria-label="引用"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 11H5v7h6v-7a5 5 0 0 0-5-5M20 11h-5v7h6v-7a5 5 0 0 0-5-5"/></svg></button>
+<div class="toolbar-group" role="group" aria-label="区块">
+<button type="button" class="tool-btn" data-block="quote" title="引用" aria-label="引用"><svg viewBox="0 0 24 24"><path d="M10 11H5v7h6v-7a5 5 0 0 0-5-5M20 11h-5v7h6v-7a5 5 0 0 0-5-5"/></svg></button>
+<button type="button" class="tool-btn" data-insert="codeblock" title="代码块" aria-label="代码块"><svg viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></button>
+<button type="button" class="tool-btn" data-insert="hr" title="分割线" aria-label="分割线"><svg viewBox="0 0 24 24"><path d="M4 12h16"/></svg></button>
+</div>
+<div class="toolbar-group" role="group" aria-label="插入">
+<button type="button" class="tool-btn" data-insert="table" title="插入表格" aria-label="插入表格"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 10v10M15 10v10"/></svg></button>
+<button type="button" class="tool-btn" data-insert="math" title="插入公式" aria-label="插入公式"><svg viewBox="0 0 24 24"><path d="M18 5H8l-4 14h10M8 12h8M14 8l6 10M20 8l-6 10"/></svg></button>
 </div></div>
 <div class="editor" id="editor" contenteditable="true" spellcheck="false" role="textbox" aria-multiline="true"></div></div><div class="doc-empty" id="empty" hidden><span class="empty-icon-frame"><img id="empty-icon" alt="" draggable="false"></span><h2>没有打开的笔记</h2><p>从列表选择一篇笔记，或者新建一个想法。</p><button class="btn" id="empty-new" type="button">新建笔记</button></div></div></main></div><div id="modal-root"></div>
 <div class="toast" id="toast"></div>
@@ -1182,29 +1201,37 @@ function wrapSelection(open, close) {
   }
 }
 
+function applyLineFormat(kind) {
+  const note=currentNote();if(!note)return;
+  const md=note.body||'',sel=selectionOffsets(),p=sel?sel.start:(caretOffset()==null?md.length:caretOffset());
+  const start=md.lastIndexOf('\n',Math.max(0,p-1))+1,lineEnd=md.indexOf('\n',p),end=lineEnd<0?md.length:lineEnd;
+  const raw=md.slice(start,end),match=raw.match(/^(#{1,6}\s+|[-*+]\s+\[[ xX]\]\s+|[-*+]\s+|\d+\.\s+|>\s?)/);
+  const clean=match?raw.slice(match[0].length):raw,prefix={bullet:'- ',ordered:'1. ',quote:'> ',task:'- [ ] '}[kind]||(kind[0]==='h'?'#'.repeat(Number(kind.slice(1)))+' ':'');
+  if(!prefix)return;const rel=Math.max(0,p-start-(match?match[0].length:0));
+  applyBody(md.slice(0,start)+prefix+clean+md.slice(end),start+prefix.length+Math.min(rel,clean.length),true);
+}
+function insertBlockTemplate(template,focusWithin) {
+  const note=currentNote();if(!note)return;
+  const md=note.body||'',sel=selectionOffsets(),start=sel?sel.start:(caretOffset()==null?md.length:caretOffset()),end=sel?sel.end:start;
+  const before=md.slice(0,start),after=md.slice(end),lead=before&&!before.endsWith('\n')?'\n\n':'',tail=after&&!after.startsWith('\n')?'\n\n':'';
+  applyBody(before+lead+template+tail+after,start+lead.length+(typeof focusWithin==='number'?focusWithin:template.length),true);ensureCaretVisible();
+}
 function bindToolbar() {
   $('editor-toolbar').querySelectorAll('button').forEach((button) => {
     button.addEventListener('mousedown', (e) => e.preventDefault());
     button.addEventListener('click', () => {
-      const f = button.dataset.format, k = button.dataset.block;
-      if (f === 'bold') wrapSelection('**', '**');
-      else if (f === 'italic') wrapSelection('*', '*');
-      else if (f === 'strike') wrapSelection('~~', '~~');
-      else if (f === 'code') wrapSelection('\`', '\`');
-      else if (f === 'link') wrapSelection('[', '](https://)');
-      else if (k) {
-        const note = currentNote();
-        if (!note) return;
-        const md = note.body || '';
-        const p = caretOffset() == null ? md.length : caretOffset();
-        const start = md.lastIndexOf('\n', Math.max(0, p - 1)) + 1;
-        const lineEnd = md.indexOf('\n', p);
-        const rest = md.slice(start, lineEnd < 0 ? md.length : lineEnd);
-        const match = rest.match(/^(#{1,6}\s+|[-*+]\s+|\d+\.\s+|>\s?|- \[[ xX]\]\s+)/);
-        const clean = match ? rest.slice(match[0].length) : rest;
-        const prefix = { h1: '# ', h2: '## ', bullet: '- ', ordered: '1. ', quote: '> ', task: '- [ ] ' }[k];
-        applyBody(md.slice(0, start) + prefix + clean + md.slice(lineEnd < 0 ? md.length : lineEnd), start + prefix.length + Math.max(0, p - start), true);
-      }
+      const f=button.dataset.format,k=button.dataset.block,insert=button.dataset.insert;
+      if(f==='bold')wrapSelection('**','**');
+      else if(f==='italic')wrapSelection('*','*');
+      else if(f==='underline')wrapSelection('++','++');
+      else if(f==='strike')wrapSelection('~~','~~');
+      else if(f==='code')wrapSelection('\`','\`');
+      else if(f==='link')wrapSelection('[','](https://)');
+      else if(k)applyLineFormat(k);
+      else if(insert==='codeblock')insertBlockTemplate('\`\`\`\n\n\`\`\`',4);
+      else if(insert==='hr')insertBlockTemplate('---',3);
+      else if(insert==='table')insertBlockTemplate('| 标题 1 | 标题 2 |\n| --- | --- |\n| 内容 | 内容 |',2);
+      else if(insert==='math')insertBlockTemplate('$\n\\frac{a}{b} = c\n$',9);
       focusEditor();
     });
   });
