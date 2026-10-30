@@ -1179,12 +1179,13 @@ function destroyTableWidgets() {
     if (widget._tabulator) {
       try { widget._tabulator.destroy(); } catch (e) { /* stale widget */ }
       widget._tabulator = null;
+      widget._tabulatorReady = false;
     }
   });
 }
 
 function tabulatorFields(widget) {
-  if (widget._tabulator) {
+  if (widget._tabulatorReady && widget._tabulator) {
     return widget._tabulator.getColumnDefinitions().map((column) => column.field).filter(Boolean);
   }
   return Array.from({length:Number(widget.dataset.columnCount || 0)},(_,i)=>'c'+i);
@@ -1236,11 +1237,17 @@ function initTableWidgets() {
         }
       });
       widget._tabulator = instance;
-      widget.dataset.columnCount = String(columns.length);
-      widget.dataset.activeRow = data[0] ? data[0].id : '';
-      widget.dataset.activeCol = columns[0] ? columns[0].field : '';
+      widget._tabulatorReady = false;
       host.dataset.tabulatorMounted = 'true';
-      refreshTableControlState(widget);
+      widget.querySelectorAll('[data-table-action]').forEach((button) => { button.disabled = true; });
+      instance.on('tableBuilt', () => {
+        if (!widget.isConnected || widget._tabulator !== instance) return;
+        widget._tabulatorReady = true;
+        widget.dataset.columnCount = String(columns.length);
+        widget.dataset.activeRow = data[0] ? data[0].id : '';
+        widget.dataset.activeCol = columns[0] ? columns[0].field : '';
+        refreshTableControlState(widget);
+      });
     });
   }).catch(() => {
     // Keep the built-in Markdown grid usable if the optional CDN is unavailable.
@@ -1249,7 +1256,7 @@ function initTableWidgets() {
 
 function readTabulatorTable(widget) {
   const instance = widget && widget._tabulator;
-  if (!instance) return null;
+  if (!instance || !widget._tabulatorReady) return null;
   const fields = tabulatorFields(widget);
   const rows = instance.getData().map((record) => fields.map((field) => String(record[field] == null ? '' : record[field])));
   const original = parseMarkdownTable(widget.dataset.raw || '');
@@ -1260,7 +1267,7 @@ function readTabulatorTable(widget) {
 
 function commitTabulatorTable(widget,structural) {
   const note = currentNote();
-  if (!note || !widget || !widget.isConnected || !widget._tabulator) return;
+  if (!note || !widget || !widget.isConnected || !widget._tabulator || !widget._tabulatorReady) return;
   const index = Number(widget.dataset.i);
   const block = splitBlocks(note.body || '')[index];
   if (!block || block.type !== 'table') return;
@@ -2859,7 +2866,7 @@ function readTableWidget(table) {
 function refreshTableControlState(table) {
   const removeRow = table.querySelector('[data-table-action="remove-row"]');
   const removeCol = table.querySelector('[data-table-action="remove-col"]');
-  if (table._tabulator) {
+  if (table._tabulatorReady && table._tabulator) {
     const rows = table._tabulator.getData();
     const fields = tabulatorFields(table);
     const active = rows.find((row) => row.id === table.dataset.activeRow);
@@ -2939,7 +2946,7 @@ function handleTableAction(button) {
   const table = button.closest('.table-widget');
   if (!table) return;
   const action = button.dataset.tableAction;
-  if (table._tabulator) {
+  if (table._tabulatorReady && table._tabulator) {
     const instance = table._tabulator;
     const rows = instance.getData();
     const fields = tabulatorFields(table);
