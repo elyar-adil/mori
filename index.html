@@ -709,7 +709,7 @@ function renderTableBlock(b,active,index){
     r.cells.forEach(c=>{html+='<span class="table-cell">'+escapeHtml(c)+'</span><span class="mk">|</span>';});
     html+='<span class="mk">'+escapeHtml(r.trail)+'</span>';
     return '<div class="table-row'+(ri===0?' table-head':'')+'" style="grid-template-columns:repeat('+cols+',minmax(0,1fr))">'+html+'</div>';
-  }).join('');
+  }).join('<span class="mk">\\n</span>');
   return '<div class="blk table'+(active?' active':'')+'" data-i="'+index+'">'+rows+'</div>';
 }
 function splitBlocks(md) {
@@ -948,7 +948,10 @@ function textOffsetWithin(root, node, offset) {
 }
 
 function blockSourceText(el) {
-  return el && el.classList && el.classList.contains('math-block') ? (el.dataset.raw || '') : (el ? el.textContent : '');
+  if (!el) return '';
+  if (el.classList.contains('math-block')) return el.dataset.raw || '';
+  if (el.classList.contains('table')) return blockText(el, false);
+  return el.textContent;
 }
 function caretOffset() {
   const sel = window.getSelection();
