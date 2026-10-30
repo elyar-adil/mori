@@ -436,124 +436,66 @@ u{text-decoration-thickness:1px;text-underline-offset:3px}
 }
 
 
-/* Mori toolbar: explicit SVG paint + dependable control surfaces */
+
+/* Mori toolbar — quiet controls, visible formatting state */
 #editor-toolbar{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:flex-start!important;
-  flex-wrap:wrap!important;
-  gap:7px 8px!important;
-  width:100%;
-  max-width:100%;
-  min-width:0;
-  min-height:42px;
-  overflow:visible!important;
-  padding:5px 0 11px!important;
-  margin:0 0 15px!important;
-  border:0!important;
+  display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;
+  gap:5px 9px;width:100%;max-width:100%;min-width:0;min-height:34px;
+  padding:3px 0 12px;margin:0 0 14px;border-bottom:1px solid var(--line);overflow:visible;
 }
 #editor-toolbar .toolbar-group{
-  display:flex!important;
-  align-items:center!important;
-  flex:0 0 auto!important;
-  gap:2px!important;
-  padding:3px!important;
-  border:1px solid var(--line)!important;
-  border-radius:10px!important;
-  background:var(--side)!important;
-  box-shadow:0 1px 3px rgba(35,35,28,.07)!important;
+  display:flex;align-items:center;flex:0 0 auto;gap:1px;
+  padding:0 9px 0 0;margin:0;border:0;border-right:1px solid var(--line);
+  border-radius:0;background:transparent;box-shadow:none;
 }
+#editor-toolbar .toolbar-group:last-child{padding-right:0;border-right:0}
 #editor-toolbar .tool-btn{
-  -webkit-appearance:none!important;
-  appearance:none!important;
-  display:grid!important;
-  place-items:center!important;
-  flex:0 0 32px!important;
-  width:32px!important;
-  min-width:32px!important;
-  height:32px!important;
-  min-height:32px!important;
-  padding:0!important;
-  border:1px solid transparent!important;
-  border-radius:7px!important;
-  background:transparent!important;
-  color:var(--ink)!important;
-  opacity:1!important;
-  visibility:visible!important;
-  line-height:1!important;
+  -webkit-appearance:none;appearance:none;display:grid;place-items:center;
+  flex:0 0 29px;width:29px;min-width:29px;height:29px;min-height:29px;padding:0;
+  border:1px solid transparent;border-radius:7px;background:transparent;
+  color:var(--muted);opacity:1;visibility:visible;line-height:1;
+  transition:background .12s ease,color .12s ease,border-color .12s ease;
 }
-#editor-toolbar .tool-btn > svg{
-  display:block!important;
-  visibility:visible!important;
-  opacity:1!important;
-  width:18px!important;
-  height:18px!important;
-  fill:none!important;
-  stroke:currentColor!important;
-  stroke-width:1.8!important;
-  stroke-linecap:round!important;
-  stroke-linejoin:round!important;
-  overflow:visible!important;
+#editor-toolbar .tool-btn>svg{
+  display:block;width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.75;
+  stroke-linecap:round;stroke-linejoin:round;opacity:1;visibility:visible;
 }
-#editor-toolbar .tool-btn > svg path,
-#editor-toolbar .tool-btn > svg line,
-#editor-toolbar .tool-btn > svg polyline,
-#editor-toolbar .tool-btn > svg polygon,
-#editor-toolbar .tool-btn > svg rect,
-#editor-toolbar .tool-btn > svg circle,
-#editor-toolbar .tool-btn > svg ellipse{
-  fill:none!important;
-  stroke:currentColor!important;
-  stroke-width:1.8!important;
-  stroke-linecap:round!important;
-  stroke-linejoin:round!important;
+#editor-toolbar .tool-btn>svg path,
+#editor-toolbar .tool-btn>svg line,
+#editor-toolbar .tool-btn>svg polyline,
+#editor-toolbar .tool-btn>svg polygon,
+#editor-toolbar .tool-btn>svg rect,
+#editor-toolbar .tool-btn>svg circle,
+#editor-toolbar .tool-btn>svg ellipse{
+  fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;
 }
-#editor-toolbar .tool-btn:hover{
-  background:var(--paper)!important;
-  border-color:var(--line)!important;
+#editor-toolbar .tool-btn:hover:not(:disabled){background:var(--hover);color:var(--ink)}
+#editor-toolbar .tool-btn.is-active,
+#editor-toolbar .tool-btn[aria-pressed="true"]{
+  background:var(--accent-soft);border-color:transparent;color:var(--accent);
 }
-#editor-toolbar .tool-btn:active{
-  background:var(--accent-soft)!important;
-  border-color:var(--accent)!important;
-  color:var(--accent)!important;
-}
-#editor-toolbar .tool-btn:focus-visible{
-  outline:2px solid var(--accent)!important;
-  outline-offset:1px!important;
+#editor-toolbar .tool-btn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+#editor-toolbar .tool-btn:disabled{
+  opacity:.28;cursor:not-allowed;background:transparent;color:var(--faint);
 }
 #editor-toolbar .tool-btn.heading-btn{
-  flex-basis:30px!important;
-  width:30px!important;
-  min-width:30px!important;
-  font:700 10px/1 var(--ui)!important;
-  letter-spacing:-.04em!important;
-  color:var(--ink)!important;
+  flex-basis:29px;width:29px;min-width:29px;font:650 10px/1 var(--ui);
+  letter-spacing:-.045em;color:var(--muted);
 }
+#editor-toolbar .tool-btn.heading-btn[data-block="h1"]{font-size:12px;font-weight:750}
+#editor-toolbar .tool-btn.heading-btn[data-block="h2"]{font-size:11px;font-weight:700}
+#editor-toolbar .tool-btn.heading-btn[data-block="h3"]{font-size:10px;font-weight:700}
+#editor-toolbar .tool-btn.heading-btn[data-block="h4"],
+#editor-toolbar .tool-btn.heading-btn[data-block="h5"],
+#editor-toolbar .tool-btn.heading-btn[data-block="h6"]{font-size:9px;font-weight:650}
 @media(max-width:760px){
-  #editor-toolbar{
-    flex-wrap:wrap!important;
-    overflow:visible!important;
-    overflow-x:visible!important;
-    overflow-y:visible!important;
-    column-gap:6px!important;
-    row-gap:6px!important;
-  }
-  #editor-toolbar .toolbar-group{flex-shrink:0!important}
+  #editor-toolbar{flex-wrap:wrap;overflow:visible;column-gap:6px;row-gap:6px}
+  #editor-toolbar .toolbar-group{flex-shrink:0}
 }
 @media(max-width:420px){
-  #editor-toolbar .toolbar-group{gap:1px!important;padding:2px!important}
-  #editor-toolbar .tool-btn{
-    flex-basis:29px!important;
-    width:29px!important;
-    min-width:29px!important;
-    height:29px!important;
-    min-height:29px!important;
-  }
-  #editor-toolbar .tool-btn.heading-btn{
-    flex-basis:27px!important;
-    width:27px!important;
-    min-width:27px!important;
-  }
+  #editor-toolbar .toolbar-group{gap:0;padding-right:6px}
+  #editor-toolbar .tool-btn{flex-basis:27px;width:27px;min-width:27px;height:28px;min-height:28px}
+  #editor-toolbar .tool-btn.heading-btn{flex-basis:25px;width:25px;min-width:25px}
 }
 
 </style>
@@ -1035,6 +977,7 @@ function renderDoc(opts) {
   if (!note) {
     editor.innerHTML = '';
     editor.classList.remove('is-empty');
+    updateToolbarState();
     return;
   }
   const md = note.body || '';
@@ -1048,16 +991,113 @@ function renderDoc(opts) {
     setCaret(o.caret);
     focusEditor();
   }
+  updateToolbarState();
+}
+
+function inlineFormatRanges(line, kind) {
+  const backtick = String.fromCharCode(96);
+  const patterns = {
+    bold: /(\*\*|__)(.+?)\1/g,
+    italic: /(^|[^*])\*([^*\n]+)\*(?!\*)|(^|[^_])_([^_\n]+)_(?!_)/g,
+    underline: /\+\+([^+\n]+)\+\+/g,
+    strike: /~~([^~\n]+)~~/g,
+    code: new RegExp(backtick+'([^'+backtick+'\n]+)'+backtick,'g'),
+    link: /\[([^\]\n]+)\]\(([^)\s]+)\)/g
+  };
+  const re = patterns[kind];
+  if (!re) return [];
+  const ranges = [];
+  re.lastIndex = 0;
+  let m;
+  while ((m = re.exec(line))) {
+    if (kind === 'bold') {
+      ranges.push({start:m.index + 2, end:m.index + 2 + m[2].length});
+    } else if (kind === 'italic') {
+      if (m[2] != null) ranges.push({start:m.index + m[1].length + 1, end:m.index + m[1].length + 1 + m[2].length});
+      else if (m[4] != null) ranges.push({start:m.index + m[3].length + 1, end:m.index + m[3].length + 1 + m[4].length});
+    } else if (kind === 'link') {
+      ranges.push({start:m.index + 1, end:m.index + 1 + m[1].length});
+    } else {
+      const content = m[1];
+      const delimiter = kind === 'underline' || kind === 'strike' ? 2 : 1;
+      ranges.push({start:m.index + delimiter, end:m.index + delimiter + content.length});
+    }
+    if (!m[0].length) re.lastIndex++;
+  }
+  return ranges;
+}
+
+function toolbarRangeActive(ranges, start, end) {
+  return ranges.some((r) => start === end
+    ? start >= r.start && start <= r.end
+    : start >= r.start && end <= r.end);
+}
+
+function updateToolbarState() {
+  const toolbar = $('editor-toolbar');
+  if (!toolbar) return;
+  const note = currentNote();
+  const focused = document.activeElement === editor || editor.contains(document.activeElement);
+  const sel = focused ? selectionOffsets() : null;
+  const caret = focused ? caretOffset() : null;
+  const point = sel ? sel.start : (caret == null ? null : caret);
+  const md = note ? note.body || '' : '';
+  const blocks = note ? splitBlocks(md) : [];
+  const firstIndex = point == null || !blocks.length ? -1 : blockIndexAt(blocks, point);
+  const lastPoint = sel && sel.end > sel.start ? sel.end - 1 : point;
+  const lastIndex = lastPoint == null || !blocks.length ? firstIndex : blockIndexAt(blocks, lastPoint);
+  const sameBlock = firstIndex >= 0 && firstIndex === lastIndex;
+  const block = sameBlock ? blocks[firstIndex] : null;
+  const unsupportedBlock = !block || ['code','math','table','hr'].includes(block.type);
+  const start = sel ? sel.start : point;
+  const end = sel ? sel.end : point;
+  const sameLine = start == null || end == null || md.slice(start, end).indexOf('\n') < 0;
+  const inlineActive = {};
+
+  if (block && start != null && end != null && sameLine && !unsupportedBlock) {
+    const lineStart = md.lastIndexOf('\n', Math.max(0, start - 1)) + 1;
+    const lineEndAt = md.indexOf('\n', start);
+    const lineEnd = lineEndAt < 0 ? md.length : lineEndAt;
+    const line = md.slice(lineStart, lineEnd);
+    const localStart = Math.max(0, start - lineStart);
+    const localEnd = Math.max(0, end - lineStart);
+    for (const kind of ['bold','italic','underline','strike','code','link']) {
+      inlineActive[kind] = toolbarRangeActive(inlineFormatRanges(line, kind), localStart, localEnd);
+    }
+  }
+
+  const blockKinds = new Set();
+  if (block) {
+    if (/^h[1-6]$/.test(block.type)) blockKinds.add(block.type);
+    if (['bullet','ordered','task','quote'].includes(block.type)) blockKinds.add(block.type);
+  }
+  const canEdit = !!note && focused;
+  toolbar.querySelectorAll('.tool-btn').forEach((button) => {
+    const format = button.dataset.format;
+    const kind = button.dataset.block;
+    const isBlockTool = !!kind;
+    const isInlineTool = !!format;
+    const enabled = canEdit && !unsupportedBlock && (isBlockTool ? sameBlock : isInlineTool ? sameLine : true);
+    const active = format ? !!inlineActive[format] : kind ? blockKinds.has(kind) : false;
+    button.disabled = !enabled;
+    button.classList.toggle('is-active', active);
+    button.setAttribute('aria-pressed', String(active));
+    if (!enabled) button.setAttribute('aria-disabled','true');
+    else button.removeAttribute('aria-disabled');
+  });
 }
 
 function updateActive() {
   const note = currentNote();
-  if (!note) return;
-  const off = caretOffset();
-  if (off == null) return;
-  const blocks = splitBlocks(note.body || '');
-  const idx = blockIndexAt(blocks, off);
-  blockEls().forEach((el, i) => el.classList.toggle('active', i === idx));
+  if (note) {
+    const off = caretOffset();
+    if (off != null) {
+      const blocks = splitBlocks(note.body || '');
+      const idx = blockIndexAt(blocks, off);
+      blockEls().forEach((el, i) => el.classList.toggle('active', i === idx));
+    }
+  }
+  updateToolbarState();
 }
 
 /* ---------- caret & selection ---------- */
@@ -2397,11 +2437,18 @@ function bind() {
 
   document.addEventListener('selectionchange', () => {
     if (composing) return;
-    if (document.activeElement !== editor && !editor.contains(document.activeElement)) return;
+    if (document.activeElement !== editor && !editor.contains(document.activeElement)) {
+      updateToolbarState();
+      return;
+    }
     const off = caretOffset();
     if (off != null) lastCaret = off;
     updateActive();
   });
+  editor.addEventListener('keyup', updateActive);
+  editor.addEventListener('mouseup', updateActive);
+  editor.addEventListener('focus', updateToolbarState);
+  editor.addEventListener('blur', () => requestAnimationFrame(updateToolbarState));
 
   document.addEventListener('keydown', (e) => {
     const mod = e.metaKey || e.ctrlKey;
