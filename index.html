@@ -435,6 +435,127 @@ u{text-decoration-thickness:1px;text-underline-offset:3px}
   .editor-toolbar .tool-btn.heading-btn{flex-basis:27px;width:27px;font-size:9px}
 }
 
+
+/* Mori toolbar: explicit SVG paint + dependable control surfaces */
+#editor-toolbar{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  flex-wrap:wrap!important;
+  gap:7px 8px!important;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  min-height:42px;
+  overflow:visible!important;
+  padding:5px 0 11px!important;
+  margin:0 0 15px!important;
+  border:0!important;
+}
+#editor-toolbar .toolbar-group{
+  display:flex!important;
+  align-items:center!important;
+  flex:0 0 auto!important;
+  gap:2px!important;
+  padding:3px!important;
+  border:1px solid var(--line)!important;
+  border-radius:10px!important;
+  background:var(--side)!important;
+  box-shadow:0 1px 3px rgba(35,35,28,.07)!important;
+}
+#editor-toolbar .tool-btn{
+  -webkit-appearance:none!important;
+  appearance:none!important;
+  display:grid!important;
+  place-items:center!important;
+  flex:0 0 32px!important;
+  width:32px!important;
+  min-width:32px!important;
+  height:32px!important;
+  min-height:32px!important;
+  padding:0!important;
+  border:1px solid transparent!important;
+  border-radius:7px!important;
+  background:transparent!important;
+  color:var(--ink)!important;
+  opacity:1!important;
+  visibility:visible!important;
+  line-height:1!important;
+}
+#editor-toolbar .tool-btn > svg{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  width:18px!important;
+  height:18px!important;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.8!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+  overflow:visible!important;
+}
+#editor-toolbar .tool-btn > svg path,
+#editor-toolbar .tool-btn > svg line,
+#editor-toolbar .tool-btn > svg polyline,
+#editor-toolbar .tool-btn > svg polygon,
+#editor-toolbar .tool-btn > svg rect,
+#editor-toolbar .tool-btn > svg circle,
+#editor-toolbar .tool-btn > svg ellipse{
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.8!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+#editor-toolbar .tool-btn:hover{
+  background:var(--paper)!important;
+  border-color:var(--line)!important;
+}
+#editor-toolbar .tool-btn:active{
+  background:var(--accent-soft)!important;
+  border-color:var(--accent)!important;
+  color:var(--accent)!important;
+}
+#editor-toolbar .tool-btn:focus-visible{
+  outline:2px solid var(--accent)!important;
+  outline-offset:1px!important;
+}
+#editor-toolbar .tool-btn.heading-btn{
+  flex-basis:30px!important;
+  width:30px!important;
+  min-width:30px!important;
+  font:700 10px/1 var(--ui)!important;
+  letter-spacing:-.04em!important;
+  color:var(--ink)!important;
+}
+@media(max-width:760px){
+  #editor-toolbar{
+    flex-wrap:wrap!important;
+    overflow:visible!important;
+    overflow-x:visible!important;
+    overflow-y:visible!important;
+    column-gap:6px!important;
+    row-gap:6px!important;
+  }
+  #editor-toolbar .toolbar-group{flex-shrink:0!important}
+}
+@media(max-width:420px){
+  #editor-toolbar .toolbar-group{gap:1px!important;padding:2px!important}
+  #editor-toolbar .tool-btn{
+    flex-basis:29px!important;
+    width:29px!important;
+    min-width:29px!important;
+    height:29px!important;
+    min-height:29px!important;
+  }
+  #editor-toolbar .tool-btn.heading-btn{
+    flex-basis:27px!important;
+    width:27px!important;
+    min-width:27px!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -455,29 +576,29 @@ u{text-decoration-thickness:1px;text-underline-offset:3px}
 <div class="canvas" id="canvas"><div class="doc" id="doc"><textarea class="title" id="title" rows="1" placeholder="无标题" spellcheck="false"></textarea>
 <div class="editor-toolbar" id="editor-toolbar" role="toolbar" aria-label="格式工具栏">
 <div class="toolbar-group" role="group" aria-label="文字格式">
-<button type="button" class="tool-btn" data-format="bold" title="粗体" aria-label="粗体"><svg viewBox="0 0 24 24"><path d="M7 5h6.5a3.5 3.5 0 0 1 0 7H7zM7 12h7.5a3.5 3.5 0 0 1 0 7H7z"/></svg></button>
-<button type="button" class="tool-btn" data-format="italic" title="斜体" aria-label="斜体"><svg viewBox="0 0 24 24"><path d="M14 4h6M4 20h6M15 4 9 20"/></svg></button>
-<button type="button" class="tool-btn" data-format="underline" title="下划线" aria-label="下划线"><svg viewBox="0 0 24 24"><path d="M6 4v6a6 6 0 0 0 12 0V4M4 21h16"/></svg></button>
-<button type="button" class="tool-btn" data-format="strike" title="删除线" aria-label="删除线"><svg viewBox="0 0 24 24"><path d="M7.5 7.5C8 5.3 9.7 4 12 4c2.5 0 4.4 1.2 4.8 3.2M5 12h14M8 16c.7 2.5 2.3 4 4.7 4 2.4 0 4.2-1.1 4.8-3"/></svg></button>
-<button type="button" class="tool-btn" data-format="code" title="行内代码" aria-label="行内代码"><svg viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></button>
-<button type="button" class="tool-btn" data-format="link" title="插入链接" aria-label="插入链接"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.07 0l2-2A5 5 0 0 0 12 3.93l-1.14 1.14M14 11a5 5 0 0 0-7.07 0l-2 2A5 5 0 0 0 12 17.07l1.14-1.14"/></svg></button>
+<button type="button" class="tool-btn" data-format="bold" title="粗体" aria-label="粗体"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 5h6.5a3.5 3.5 0 0 1 0 7H7zM7 12h7.5a3.5 3.5 0 0 1 0 7H7z"/></svg></button>
+<button type="button" class="tool-btn" data-format="italic" title="斜体" aria-label="斜体"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4h6M4 20h6M15 4 9 20"/></svg></button>
+<button type="button" class="tool-btn" data-format="underline" title="下划线" aria-label="下划线"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 4v6a6 6 0 0 0 12 0V4M4 21h16"/></svg></button>
+<button type="button" class="tool-btn" data-format="strike" title="删除线" aria-label="删除线"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7.5 7.5C8 5.3 9.7 4 12 4c2.5 0 4.4 1.2 4.8 3.2M5 12h14M8 16c.7 2.5 2.3 4 4.7 4 2.4 0 4.2-1.1 4.8-3"/></svg></button>
+<button type="button" class="tool-btn" data-format="code" title="行内代码" aria-label="行内代码"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></button>
+<button type="button" class="tool-btn" data-format="link" title="插入链接" aria-label="插入链接"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10 13a5 5 0 0 0 7.07 0l2-2A5 5 0 0 0 12 3.93l-1.14 1.14M14 11a5 5 0 0 0-7.07 0l-2 2A5 5 0 0 0 12 17.07l1.14-1.14"/></svg></button>
 </div>
 <div class="toolbar-group" role="group" aria-label="标题级别">
 <button type="button" class="tool-btn heading-btn" data-block="h1" title="标题 1" aria-label="标题 1">H1</button><button type="button" class="tool-btn heading-btn" data-block="h2" title="标题 2" aria-label="标题 2">H2</button><button type="button" class="tool-btn heading-btn" data-block="h3" title="标题 3" aria-label="标题 3">H3</button><button type="button" class="tool-btn heading-btn" data-block="h4" title="标题 4" aria-label="标题 4">H4</button><button type="button" class="tool-btn heading-btn" data-block="h5" title="标题 5" aria-label="标题 5">H5</button><button type="button" class="tool-btn heading-btn" data-block="h6" title="标题 6" aria-label="标题 6">H6</button>
 </div>
 <div class="toolbar-group" role="group" aria-label="列表">
-<button type="button" class="tool-btn" data-block="bullet" title="无序列表" aria-label="无序列表"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg></button>
-<button type="button" class="tool-btn" data-block="ordered" title="有序列表" aria-label="有序列表"><svg viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h10M3 5h2v3M3 12h3l-3 3h3M3 18h3"/></svg></button>
-<button type="button" class="tool-btn" data-block="task" title="待办清单" aria-label="待办清单"><svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="6" height="6" rx="1"/><path d="m5 7 1.4 1.4L9 5.7M13 7h7M3.5 15h6v6h-6zM13 18h7"/></svg></button>
+<button type="button" class="tool-btn" data-block="bullet" title="无序列表" aria-label="无序列表"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg></button>
+<button type="button" class="tool-btn" data-block="ordered" title="有序列表" aria-label="有序列表"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10 6h10M10 12h10M10 18h10M3 5h2v3M3 12h3l-3 3h3M3 18h3"/></svg></button>
+<button type="button" class="tool-btn" data-block="task" title="待办清单" aria-label="待办清单"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3.5" y="4" width="6" height="6" rx="1"/><path d="m5 7 1.4 1.4L9 5.7M13 7h7M3.5 15h6v6h-6zM13 18h7"/></svg></button>
 </div>
 <div class="toolbar-group" role="group" aria-label="区块">
-<button type="button" class="tool-btn" data-block="quote" title="引用" aria-label="引用"><svg viewBox="0 0 24 24"><path d="M10 11H5v7h6v-7a5 5 0 0 0-5-5M20 11h-5v7h6v-7a5 5 0 0 0-5-5"/></svg></button>
-<button type="button" class="tool-btn" data-insert="codeblock" title="代码块" aria-label="代码块"><svg viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></button>
-<button type="button" class="tool-btn" data-insert="hr" title="分割线" aria-label="分割线"><svg viewBox="0 0 24 24"><path d="M4 12h16"/></svg></button>
+<button type="button" class="tool-btn" data-block="quote" title="引用" aria-label="引用"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10 11H5v7h6v-7a5 5 0 0 0-5-5M20 11h-5v7h6v-7a5 5 0 0 0-5-5"/></svg></button>
+<button type="button" class="tool-btn" data-insert="codeblock" title="代码块" aria-label="代码块"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></button>
+<button type="button" class="tool-btn" data-insert="hr" title="分割线" aria-label="分割线"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16"/></svg></button>
 </div>
 <div class="toolbar-group" role="group" aria-label="插入">
-<button type="button" class="tool-btn" data-insert="table" title="插入表格" aria-label="插入表格"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 10v10M15 10v10"/></svg></button>
-<button type="button" class="tool-btn" data-insert="math" title="插入公式" aria-label="插入公式"><svg viewBox="0 0 24 24"><path d="M18 5H8l-4 14h10M8 12h8M14 8l6 10M20 8l-6 10"/></svg></button>
+<button type="button" class="tool-btn" data-insert="table" title="插入表格" aria-label="插入表格"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 10v10M15 10v10"/></svg></button>
+<button type="button" class="tool-btn" data-insert="math" title="插入公式" aria-label="插入公式"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M18 5H8l-4 14h10M8 12h8M14 8l6 10M20 8l-6 10"/></svg></button>
 </div></div>
 <div class="editor" id="editor" contenteditable="true" spellcheck="false" role="textbox" aria-multiline="true"></div></div><div class="doc-empty" id="empty" hidden><span class="empty-icon-frame"><img id="empty-icon" alt="" draggable="false"></span><h2>没有打开的笔记</h2><p>从列表选择一篇笔记，或者新建一个想法。</p><button class="btn" id="empty-new" type="button">新建笔记</button></div></div></main></div><div id="modal-root"></div>
 <div class="toast" id="toast"></div>
