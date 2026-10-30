@@ -709,7 +709,7 @@ function renderTableBlock(b,active,index){
     r.cells.forEach(c=>{html+='<span class="table-cell">'+escapeHtml(c)+'</span><span class="mk">|</span>';});
     html+='<span class="mk">'+escapeHtml(r.trail)+'</span>';
     return '<div class="table-row'+(ri===0?' table-head':'')+'" style="grid-template-columns:repeat('+cols+',minmax(0,1fr))">'+html+'</div>';
-  }).join('<span class="mk">\\n</span>');
+  }).join('<span class="mk">\n</span>');
   return '<div class="blk table'+(active?' active':'')+'" data-i="'+index+'">'+rows+'</div>';
 }
 function splitBlocks(md) {
