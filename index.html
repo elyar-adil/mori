@@ -97,8 +97,6 @@ body.dark .brand-mark img,body.dark .empty-icon-frame img,body.dark .animal-choi
 .nav-item span:first-of-type{flex:1}
 .nav-count{font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
 .sidebar-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;margin:0 -4px;padding:0 4px 12px;scrollbar-width:thin}
-.collapse-btn{margin-left:auto;width:32px;height:32px;opacity:.7}
-.collapse-btn:hover{opacity:1}
 .nav-group{margin-top:18px}
 .nav-group-head{display:flex;align-items:center;gap:2px;padding:0 4px 0 4px;margin-bottom:4px}
 .nav-group-toggle{flex:1;display:flex;align-items:center;gap:5px;height:28px;padding:0 6px;border-radius:7px;font-size:11.5px;font-weight:650;letter-spacing:.08em;color:var(--faint);text-align:left}
@@ -123,14 +121,17 @@ body.dark .brand-mark img,body.dark .empty-icon-frame img,body.dark .animal-choi
 .menu-check{margin-left:auto;font-size:12px;color:var(--faint);font-weight:400}
 .ask-modal{width:min(400px,100%)}
 .ask-modal .field{margin-top:12px}
-.nav-expand-btn{display:none;margin:0 6px 0 -6px}
+.nav-toggle{display:grid;place-items:center;flex-shrink:0;width:32px;height:32px;margin:0 4px 0 -7px;border-radius:8px;color:var(--faint);transition:background .12s,color .12s}
+.nav-toggle:hover{background:var(--hover);color:var(--ink)}
+.nav-toggle svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.nav-toggle .panel-fill{fill:currentColor;stroke:none;opacity:.28;transition:opacity .15s}
+.app.nav-collapsed .nav-toggle .panel-fill{opacity:0}
 .list-title-wrap{flex:1;min-width:0}
 .list-heading-row h1{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (min-width:761px){
   .app{transition:grid-template-columns .22s var(--ease)}
   .app.nav-collapsed{grid-template-columns:0 320px minmax(0,1fr)}
   .app.nav-collapsed .sidebar{visibility:hidden;padding-inline:0;overflow:hidden}
-  .app.nav-collapsed .nav-expand-btn{display:grid}
 }
 .sidebar-bottom{margin-top:auto;padding:10px 4px 0;display:flex;align-items:center;gap:4px}
 .bottom-btn{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;color:var(--muted)}
@@ -459,7 +460,7 @@ body.dark .toast{background:#e9ebe0;color:#1c1f18}
   .nav-item{justify-content:center;padding:0;gap:0;min-height:42px;position:relative}
   .nav-item .nav-count{display:none}
   .sidebar-bottom{flex-direction:column;justify-content:center;padding:10px 0 0}
-  .nav-group-head,.nav-empty,.nav-empty-text,.collapse-btn{display:none}
+  .nav-group-head,.nav-empty,.nav-empty-text{display:none}
   .nav-group{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
   .nav-group.collapsed .nav-list{display:grid}
   .app.nav-collapsed{grid-template-columns:0 290px minmax(0,1fr)}
@@ -477,7 +478,7 @@ body.dark .toast{background:#e9ebe0;color:#1c1f18}
   .main{grid-column:1;grid-row:1;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
   .sidebar,.note-sidebar{padding-left:max(12px,env(safe-area-inset-left))}
   .nav-toggle-btn,.back-btn{display:grid}
-  .collapse-btn,.nav-expand-btn{display:none!important}
+  .nav-toggle{display:none}
   .topbar{padding-inline:8px;gap:2px}
   .status{margin-right:4px;font-size:12px;max-width:34vw}
   .icon-btn{width:40px;height:40px}
@@ -505,6 +506,10 @@ body.dark .toast{background:#e9ebe0;color:#1c1f18}
   .font-choice b{font-size:18px}
   .toast{bottom:calc(76px + env(safe-area-inset-bottom))}
 }
+@supports (height:100lvh){
+  /* reach under the floating Safari toolbar instead of stopping above it */
+  @media (max-width:760px){.app{bottom:auto;height:100lvh}}
+}
 @keyframes sheet{from{transform:translateY(40px);opacity:.4}}
 @media (pointer:coarse){
   .nav-item{min-height:46px}
@@ -520,7 +525,7 @@ body.dark .toast{background:#e9ebe0;color:#1c1f18}
 <body>
 <div class="app" id="app">
 <aside class="sidebar" id="sidebar" aria-label="导航">
-<header class="sidebar-head"><div class="brand"><span class="brand-mark"><img id="brand-icon" alt="" draggable="false"></span><span class="brand-name">Mori</span></div><button class="bottom-btn collapse-btn" id="nav-collapse" title="收起侧栏 (⌘\)" aria-label="收起侧栏" aria-expanded="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M9 4.5v15M15.5 10l-2 2 2 2"/></svg></button></header>
+<header class="sidebar-head"><div class="brand"><span class="brand-mark"><img id="brand-icon" alt="" draggable="false"></span><span class="brand-name">Mori</span></div></header>
 <div class="sidebar-scroll">
 <div class="nav-section-label">资料库</div><nav class="nav-list">
 <button class="nav-item active" data-switch-view="all" title="所有笔记"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h8M8 17h5"/></svg><span>所有笔记</span><span class="nav-count" id="nav-all-count"></span></button>
@@ -532,7 +537,7 @@ body.dark .toast{background:#e9ebe0;color:#1c1f18}
 </div>
 <div class="sidebar-bottom"><button class="bottom-btn" id="theme-btn" title="切换深色模式" aria-label="切换深色模式"><svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg><svg class="icon-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></button><button class="bottom-btn" id="settings-btn" title="设置" aria-label="设置"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 13.5 21 15l-2 3-2.4-1a8 8 0 0 1-2 1.2L14 21h-4l-.6-2.8a8 8 0 0 1-2-1.2L5 18l-2-3 2-1.5a8 8 0 0 1 0-2L3 10l2-3 2.4 1a8 8 0 0 1 2-1.2L10 4h4l.6 2.8a8 8 0 0 1 2 1.2L19 7l2 3-2 1.5a8 8 0 0 1 0 2Z"/></svg></button></div>
 </aside><div class="overlay" id="overlay"></div>
-<aside class="note-sidebar" id="note-sidebar"><header class="list-header"><div class="list-heading-row"><button class="icon-btn nav-expand-btn" id="nav-expand" title="展开侧栏 (⌘\)" aria-label="展开侧栏"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M9 4.5v15M13.5 10l2 2-2 2"/></svg></button><div class="list-title-wrap"><div class="list-eyebrow" id="list-eyebrow">你的空间</div><h1 id="list-title">所有笔记</h1></div><button class="new-btn" id="new-btn" title="新建笔记 (⌘N / Ctrl+Alt+N)" aria-label="新建笔记"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
+<aside class="note-sidebar" id="note-sidebar"><header class="list-header"><div class="list-heading-row"><button class="nav-toggle" id="nav-panel-toggle" title="隐藏侧栏 (⌘\)" aria-label="隐藏侧栏" aria-expanded="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect class="panel-fill" x="4" y="5" width="5.5" height="14" rx="1.5"/><rect x="3.25" y="4.25" width="17.5" height="15.5" rx="3"/><path d="M10 4.5v15"/></svg></button><div class="list-title-wrap"><div class="list-eyebrow" id="list-eyebrow">你的空间</div><h1 id="list-title">所有笔记</h1></div><button class="new-btn" id="new-btn" title="新建笔记 (⌘N / Ctrl+Alt+N)" aria-label="新建笔记"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
 <label class="search-wrap"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 4 4"/></svg><input class="search" id="search" type="search" placeholder="搜索笔记…" aria-label="搜索笔记" enterkeyhint="search" autocomplete="off" spellcheck="false"><kbd id="search-kbd">⌘K</kbd></label></header>
 <div class="list" id="list"></div><footer class="list-footer"><span id="note-count">0 篇笔记</span><span class="sync-state"><i class="sync-dot" id="list-sync-dot"></i><span id="list-sync-label">仅保存在本机</span></span></footer></aside>
 <main class="main"><header class="topbar"><button class="icon-btn nav-toggle-btn" id="nav-btn" title="打开导航" aria-label="打开导航"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="icon-btn back-btn" id="back-btn" title="笔记列表" aria-label="笔记列表"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h11M4 18h8"/></svg></button><div class="spacer"></div><span class="status" role="status" aria-live="polite" id="status">已保存</span><button class="icon-btn" id="sync-btn" title="同步 (⌘S)" aria-label="同步"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-13.6 5.7M4 12a8 8 0 0 1 13.6-5.7"/><path d="M20 4v5h-5M4 20v-5h5"/></svg></button><button class="icon-btn" id="star-btn" title="收藏" aria-label="收藏"><svg viewBox="0 0 24 24"><path d="m12 3.5 2.7 5.5 6 .9-4.35 4.2 1.03 6L12 17.25 6.62 20.1l1.03-6L3.3 9.9l6-.9Z"/></svg></button><button class="icon-btn" id="more-btn" title="更多" aria-label="更多操作"><svg viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg></button></header>
@@ -2568,7 +2573,6 @@ function openSettings() {
   const pick = (host, attr, key) => $(host).querySelectorAll('[' + attr + ']').forEach((btn) => btn.addEventListener('click', () => {
     state[key] = btn.getAttribute(attr);
     applyTypography();
-  app.classList.toggle('nav-collapsed', state.navCollapsed);
     savePrefs();
     $(host).querySelectorAll('[' + attr + ']').forEach((b) => { b.classList.toggle('selected', b === btn); b.setAttribute('aria-pressed', String(b === btn)); });
   }));
@@ -2819,7 +2823,11 @@ function openMenuAt(x, y, title, items) {
 function setNavCollapsed(collapsed) {
   state.navCollapsed = collapsed;
   app.classList.toggle('nav-collapsed', collapsed);
-  $('nav-collapse').setAttribute('aria-expanded', String(!collapsed));
+  const t = $('nav-panel-toggle');
+  const label = collapsed ? '显示侧栏' : '隐藏侧栏';
+  t.setAttribute('aria-expanded', String(!collapsed));
+  t.setAttribute('aria-label', label);
+  t.title = label + ' (' + (/Mac|iPhone|iPad/i.test(navigator.platform || '') ? '⌘' : 'Ctrl+') + '\\)';
   savePrefs();
 }
 
@@ -2888,8 +2896,7 @@ function bindLibrary() {
     moveNote(id, t.dataset.folder || '');
   });
 
-  $('nav-collapse').addEventListener('click', () => setNavCollapsed(true));
-  $('nav-expand').addEventListener('click', () => setNavCollapsed(false));
+  $('nav-panel-toggle').addEventListener('click', () => setNavCollapsed(!state.navCollapsed));
 }
 
 /* ---------- appearance ---------- */
@@ -2929,8 +2936,9 @@ function syncThemeColor() {
   document.body.appendChild(probe);
   const rgb = getComputedStyle(probe).color;
   probe.remove();
-  const bg = getComputedStyle(document.body).backgroundColor;
-  document.documentElement.style.setProperty('--page-bg', bg);
+  // The canvas behind Safari's translucent bottom bar shows <html>'s background;
+  // match the editor surface so no darker band appears below the page.
+  document.documentElement.style.setProperty('--page-bg', rgb);
   document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => meta.setAttribute('content', rgb));
 }
 function applyDark() {
@@ -3935,6 +3943,7 @@ function bind() {
 function boot() {
   loadLocal();
   applyTypography();
+  setNavCollapsed(state.navCollapsed);
   if (!/Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent || '')) $('search-kbd').textContent = 'Ctrl K';
   applyAnimal();
   applyDark();
