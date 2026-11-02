@@ -23,6 +23,7 @@
   --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   --radius:10px;--ease:cubic-bezier(.2,.7,.2,1);
   --doc-font:var(--ui);--doc-size:16.5px;
+  --head-ctl:34px; /* logo, sidebar toggle and new-note button share one size */
   color-scheme:light;
 }
 /* Each animal sets --h (hue), --s / --al (accent saturation / lightness), --ds
@@ -82,7 +83,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 .sidebar{grid-column:1;grid-row:1;display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--side);padding:calc(22px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom))}
 .sidebar-head{display:flex;align-items:center;gap:8px;padding:0 8px 26px;min-height:34px}
 .brand{display:flex;align-items:center;gap:10px;min-width:0;font-size:17px;font-weight:680;letter-spacing:-.03em}
-.brand-mark{width:32px;height:32px;display:grid;place-items:center;overflow:hidden;border-radius:10px;background:var(--accent-soft);flex-shrink:0}
+.brand-mark{width:var(--head-ctl);height:var(--head-ctl);display:grid;place-items:center;overflow:hidden;border-radius:10px;background:var(--accent-soft);flex-shrink:0}
 .brand-mark img{width:100%;height:100%;object-fit:cover;transform:scale(1.28);mix-blend-mode:multiply}
 body.dark .brand-mark img,body.dark .empty-icon-frame img,body.dark .animal-choice img{mix-blend-mode:normal;opacity:.92}
 .brand-name{line-height:1}
@@ -121,9 +122,9 @@ body.dark .brand-mark img,body.dark .empty-icon-frame img,body.dark .animal-choi
 .menu-check{margin-left:auto;font-size:12px;color:var(--faint);font-weight:400}
 .ask-modal{width:min(400px,100%)}
 .ask-modal .field{margin-top:12px}
-.nav-toggle{display:grid;place-items:center;flex-shrink:0;width:32px;height:32px;margin:0 4px 0 -7px;border-radius:8px;color:var(--faint);transition:background .12s,color .12s}
+.nav-toggle{display:grid;place-items:center;flex-shrink:0;width:var(--head-ctl);height:var(--head-ctl);margin:0 2px 0 0;border-radius:10px;color:var(--faint);transition:background .12s,color .12s}
 .nav-toggle:hover{background:var(--hover);color:var(--ink)}
-.nav-toggle svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.nav-toggle svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .nav-toggle .panel-fill{fill:currentColor;stroke:none;opacity:.28;transition:opacity .15s}
 .app.nav-collapsed .nav-toggle .panel-fill{opacity:0}
 .list-title-wrap{flex:1;min-width:0}
@@ -147,7 +148,7 @@ body.dark .bottom-btn .icon-moon{display:block}
 .list-header{padding:calc(22px + env(safe-area-inset-top)) 16px 12px}
 .list-heading-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;min-height:34px}
 .list-heading-row h1{font-size:24px;line-height:1.15;letter-spacing:-.04em;font-weight:660;margin:0;color:var(--ink)}
-.new-btn{width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:var(--accent);color:var(--accent-ink);flex-shrink:0;transition:filter .12s,transform .12s}
+.new-btn{width:var(--head-ctl);height:var(--head-ctl);display:grid;place-items:center;border-radius:10px;background:var(--accent);color:var(--accent-ink);flex-shrink:0;transition:filter .12s,transform .12s}
 .new-btn:hover{filter:brightness(1.08)}
 .new-btn:active{transform:scale(.95)}
 .new-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round}
