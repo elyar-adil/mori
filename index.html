@@ -208,7 +208,36 @@ body.dark .bottom-btn .icon-moon{display:block}
 .blk.task:has(.taskbox.done){color:var(--muted)}
 .blk.quote{padding:2px 0 2px 16px;border-left:3px solid var(--accent);color:var(--quote);margin:4px 0}
 .blk.hr{border-top:1px solid var(--line);min-height:0;height:0;margin:20px 0}
-.blk.code{color:var(--ink);font:13.5px/1.7 var(--mono);background:var(--code-bg);border-radius:10px;padding:12px 15px;margin:8px 0;white-space:pre-wrap;tab-size:2;overflow-wrap:anywhere}
+.blk.code{position:relative;color:var(--ink);font:13.5px/1.7 var(--mono);background:var(--code-bg);border-radius:12px;padding:40px 16px 14px;margin:10px 0;white-space:pre-wrap;tab-size:4;overflow-wrap:anywhere}
+.blk.code .code-lang,.blk.code .code-copy{position:absolute;top:7px;height:26px;display:inline-flex;align-items:center;gap:4px;padding:0 9px;border-radius:7px;font:600 11.5px/1 var(--ui);color:var(--muted);user-select:none;transition:background .12s,color .12s,opacity .12s}
+.blk.code .code{display:block;min-height:1.7em}
+.blk.code .code-lang{left:8px}
+.blk.code .code-lang::before{content:attr(data-label)}
+.blk.code .code-lang::after{content:"";width:6px;height:6px;margin:-3px 0 0 2px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg)}
+.blk.code .code-copy{right:8px;opacity:0}
+.blk.code .code-copy::before{content:"复制"}
+.blk.code:hover .code-copy,.blk.code.active .code-copy{opacity:1}
+.blk.code .code-lang:hover,.blk.code .code-copy:hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+/* syntax colours: keywords follow the theme accent, the rest is a calm fixed set */
+.blk.code .hljs-keyword,.blk.code .hljs-selector-tag,.blk.code .hljs-literal,.blk.code .hljs-doctag{color:var(--accent-text);font-weight:600}
+.blk.code .hljs-string,.blk.code .hljs-regexp,.blk.code .hljs-addition,.blk.code .hljs-symbol{color:hsl(145 48% 30%)}
+.blk.code .hljs-number,.blk.code .hljs-variable.constant_,.blk.code .hljs-bullet{color:hsl(24 80% 40%)}
+.blk.code .hljs-title,.blk.code .hljs-title.function_,.blk.code .hljs-section{color:hsl(262 50% 48%)}
+.blk.code .hljs-type,.blk.code .hljs-built_in,.blk.code .hljs-title.class_,.blk.code .hljs-selector-class{color:hsl(198 75% 32%)}
+.blk.code .hljs-attr,.blk.code .hljs-attribute,.blk.code .hljs-property,.blk.code .hljs-params,.blk.code .hljs-variable,.blk.code .hljs-template-variable{color:hsl(33 70% 34%)}
+.blk.code .hljs-comment,.blk.code .hljs-quote{color:var(--faint);font-style:italic}
+.blk.code .hljs-meta,.blk.code .hljs-tag,.blk.code .hljs-name,.blk.code .hljs-punctuation{color:var(--muted)}
+.blk.code .hljs-deletion{color:var(--danger)}
+body.dark .blk.code .hljs-string,body.dark .blk.code .hljs-regexp,body.dark .blk.code .hljs-addition,body.dark .blk.code .hljs-symbol{color:hsl(140 45% 70%)}
+body.dark .blk.code .hljs-number,body.dark .blk.code .hljs-variable.constant_,body.dark .blk.code .hljs-bullet{color:hsl(28 85% 70%)}
+body.dark .blk.code .hljs-title,body.dark .blk.code .hljs-title.function_,body.dark .blk.code .hljs-section{color:hsl(265 75% 80%)}
+body.dark .blk.code .hljs-type,body.dark .blk.code .hljs-built_in,body.dark .blk.code .hljs-title.class_,body.dark .blk.code .hljs-selector-class{color:hsl(192 70% 70%)}
+body.dark .blk.code .hljs-attr,body.dark .blk.code .hljs-attribute,body.dark .blk.code .hljs-property,body.dark .blk.code .hljs-params,body.dark .blk.code .hljs-variable,body.dark .blk.code .hljs-template-variable{color:hsl(38 80% 72%)}
+.code-lang-menu{width:220px;padding:6px}
+.code-lang-menu .lang-filter{display:block;width:100%;height:34px;margin:0 0 4px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);font-size:13.5px;outline:none}
+.code-lang-menu .lang-filter:focus{border-color:var(--accent);background:var(--paper)}
+.code-lang-menu .lang-list{max-height:280px;overflow-y:auto;overscroll-behavior:contain}
+.code-lang-menu button.on{color:var(--accent-text);font-weight:650;background:var(--accent-soft)}
 strong{font-weight:700}
 em{font-style:italic}
 del{color:var(--muted)}
@@ -227,24 +256,39 @@ a{color:var(--accent-text);text-decoration:underline;text-underline-offset:2.5px
 .blk.image-block .image-delete:hover{color:var(--danger)}
 
 /* ---------- math ---------- */
-.blk.math-block{display:block;margin:12px 0;padding:14px 16px 10px;border-radius:10px;text-align:center;white-space:normal;cursor:pointer;user-select:none;transition:background .12s}
+.blk.math-block{display:block;margin:12px 0;padding:14px 16px 10px;border-radius:12px;text-align:center;white-space:normal;cursor:pointer;user-select:none;transition:background .12s,box-shadow .12s}
 .blk.math-block *{user-select:none}
 .blk.math-block:hover{background:var(--code-bg)}
-.math-preview{overflow-x:auto;max-width:100%}
-.math-preview math{font:1.3em var(--serif)}
-.math-caption{display:block;margin-top:6px;font:12px var(--ui);color:var(--faint);opacity:0;transition:opacity .12s}
+.math-preview{overflow-x:auto;overflow-y:hidden;max-width:100%;font-size:1.12em}
+.math-preview .katex-display{margin:.2em 0}
+.math-preview math{font-size:1.25em}
+.math-caption{display:block;margin-top:4px;font:12px var(--ui);color:var(--faint);opacity:0;transition:opacity .12s}
 .blk.math-block:hover .math-caption{opacity:1}
-.math-editor-modal{width:min(640px,100%)}
-.math-editor-subtitle{margin:4px 0 0;font-size:12.5px;color:var(--muted)}
-.math-snippets{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0 12px}
-.math-snippets button{height:30px;padding:0 11px;border:1px solid var(--line);border-radius:8px;background:var(--side);color:var(--muted);font:500 12.5px var(--ui)}
-.math-snippets button:hover{background:var(--hover);color:var(--ink)}
-.math-source{display:block;width:100%;min-height:110px;resize:vertical;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:12px 13px;font:14px/1.65 var(--mono);outline:none}
-.math-source:focus{border-color:var(--accent);background:var(--paper)}
-.math-preview-label{margin:14px 0 6px;font:600 12px var(--ui);color:var(--muted)}
-.math-live-preview{display:flex;align-items:center;justify-content:center;min-height:105px;max-height:230px;overflow:auto;padding:18px 12px;border:1px solid var(--line);border-radius:10px;background:var(--side);color:var(--ink)}
-.math-live-preview math{font:1.45em var(--serif);max-width:100%}
-.math-preview-empty{font-size:12.5px;color:var(--faint)}
+.math-editor-modal{width:min(680px,100%)}
+.math-live-preview{display:flex;align-items:center;justify-content:center;min-height:110px;max-height:240px;overflow:auto;margin:10px 0 0;padding:18px 14px;border:1px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink);font-size:1.25em;transition:opacity .15s}
+.math-live-preview.stale{opacity:.45}
+.math-live-preview .katex-display{margin:0}
+.math-preview-empty{font:13px var(--ui);color:var(--faint)}
+.math-error{margin:8px 0 0;padding:8px 11px;border-radius:8px;background:color-mix(in srgb,var(--danger) 10%,transparent);color:var(--danger);font:12.5px/1.5 var(--mono)}
+.math-tabs{display:flex;gap:2px;margin:14px 0 8px;padding:3px;border-radius:10px;background:var(--hover);overflow-x:auto;scrollbar-width:none}
+.math-tabs::-webkit-scrollbar{display:none}
+.math-tabs button{flex:1 0 auto;height:30px;padding:0 12px;border-radius:8px;font-size:13px;color:var(--muted);white-space:nowrap}
+.math-tabs button[aria-selected="true"]{background:var(--paper);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.math-palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:4px;max-height:164px;overflow-y:auto;padding:2px;overscroll-behavior:contain}
+.math-key{display:grid;place-items:center;height:48px;padding:0 4px;border:1px solid var(--line);border-radius:9px;background:var(--paper);color:var(--ink);overflow:hidden;font-size:15px;transition:background .1s,border-color .1s}
+.math-key:hover{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+.math-key .katex{font-size:.86em}
+.math-key .katex-html{max-width:100%}
+.math-source-wrap{position:relative;margin-top:12px}
+.math-source{display:block;width:100%;min-height:92px;resize:vertical;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:11px 13px;font:14px/1.65 var(--mono);outline:none}
+.math-source:focus{border-color:var(--accent);background:var(--paper);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.math-suggest{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.math-suggest button{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink)}
+.math-suggest button[aria-selected="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.math-suggest code{background:none;padding:0;color:var(--muted);font-size:12px}
+.math-suggest .sg-glyph{min-width:18px;text-align:center}
+.math-hint{margin:8px 0 0;font-size:12px;color:var(--faint)}
+.math-hint kbd{font:11px var(--ui);padding:1px 5px;margin:0 1px;border:1px solid var(--line);border-radius:5px;background:var(--bg)}
 
 /* ---------- tables ---------- */
 .blk.table{position:relative;display:block;margin:22px 0 18px;padding:0;white-space:normal}
@@ -405,6 +449,8 @@ body.dark .toast{background:#e9ebe0;color:#1c1f18}
   .modal{width:100%;max-width:none;max-height:88dvh;border-radius:18px 18px 0 0;border-bottom:0;padding:20px 18px calc(22px + env(safe-area-inset-bottom));animation:sheet .22s var(--ease)}
   .math-editor-modal{padding:20px 16px calc(22px + env(safe-area-inset-bottom))}
   .math-live-preview{min-height:88px}
+  .math-palette{grid-template-columns:repeat(auto-fill,minmax(50px,1fr));max-height:150px}
+  .math-hint{display:none}
   .menu{width:100%;padding:8px 8px calc(10px + env(safe-area-inset-bottom))}
   .menu-item{height:48px;font-size:15px}
   .blk.image-block .image-delete{opacity:1;pointer-events:auto}
@@ -762,7 +808,7 @@ function latexToMathML(source) {
   function sequence(stop){const out=[];while(i<input.length&&input[i]!==stop){const before=i;out.push(atom());if(i===before)i++;}return out.join('');}
   return sequence('');
 }
-function mathExpression(raw){const lines=String(raw||'').split('\n');if(lines.length&&/^\s*\$\$\s*$/.test(lines[0]))lines.shift();if(lines.length&&/^\s*\$\$\s*$/.test(lines[lines.length-1]))lines.pop();return lines.join('\n').trim();}
+function mathExpression(raw){const one=String(raw||'').trim().match(/^\$\$([^\n]+?)\$\$$/);if(one)return one[1].trim();const lines=String(raw||'').split('\n');if(lines.length&&/^\s*\$\$\s*$/.test(lines[0]))lines.shift();if(lines.length&&/^\s*\$\$\s*$/.test(lines[lines.length-1]))lines.pop();return lines.join('\n').trim();}
 function isTableLine(line){return /^\s*\|.*\|\s*$/.test(line)&&(line.match(/\|/g)||[]).length>=3;}
 function splitMarkdownTableRow(line) {
   let value = String(line || '').trim();
@@ -885,6 +931,7 @@ function splitBlocks(md) {
       i = end + 1;
       continue;
     }
+    if (/^\s*\$\$[^$\n]+\$\$\s*$/.test(line)) { blocks.push({raw:line,start:off,type:'math',closed:true}); off+=line.length+1; i++; continue; }
     if (/^\s*\$\$\s*$/.test(line)) {
       let j=i+1;while(j<lines.length&&!/^\s*\$\$\s*$/.test(lines[j]))j++;
       const closed=j<lines.length,end=closed?j:lines.length-1,raw=lines.slice(i,end+1).join('\n');
@@ -998,9 +1045,10 @@ function renderBlock(b, active, index) {
   if (b.type === 'blank') return '<div class="' + cls + '"' + attrs + '><br></div>';
   if (b.type === 'table') return renderTableBlock(b, active, index);
   if (b.type === 'math') {
+    ensureKatex();
     const expr=mathExpression(b.raw);
     return '<div class="' + cls + ' math-block" contenteditable="false"' + attrs + ' data-raw="' + escapeHtml(b.raw) + '">' +
-      '<div class="math-preview"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">' + latexToMathML(expr) + '</math></div>' +
+      '<div class="math-preview">' + renderTex(expr, true) + '</div>' +
       '<span class="math-caption">公式 · 点击编辑 LaTeX</span></div>';
   }
   if (b.type === 'image') {
@@ -1013,18 +1061,17 @@ function renderBlock(b, active, index) {
   }
   if (b.type === 'code') {
     const lines = b.raw.split('\n');
+    const lang = codeLang(b.raw);
+    const open = '<div class="' + cls + '"' + attrs + ' data-lang="' + escapeHtml(lang) + '">' + codeBlockChrome(lang, b.closed && lines.length > 1);
     if (!b.closed) {
       const rest = lines.slice(1);
       const opening = rest.length ? lines[0] + '\n' : lines[0];
-      const body = rest.join('\n');
-      return '<div class="' + cls + '"' + attrs + '><span class="mk">' + escapeHtml(opening) + '</span><span class="code">' + escapeHtml(body) + '</span></div>';
+      return open + '<span class="mk">' + escapeHtml(opening) + '</span><span class="code">' + highlightCode(rest.join('\n'), lang) + '</span></div>';
     }
-    if (lines.length === 1) return '<div class="' + cls + '"' + attrs + '><span class="mk">' + escapeHtml(lines[0]) + '</span></div>';
+    if (lines.length === 1) return open + '<span class="mk">' + escapeHtml(lines[0]) + '</span></div>';
     const middle = lines.slice(1, -1);
-    const opening = lines[0] + '\n';
-    const body = middle.join('\n');
     const closing = (middle.length ? '\n' : '') + lines[lines.length - 1];
-    return '<div class="' + cls + '"' + attrs + '><span class="mk">' + escapeHtml(opening) + '</span><span class="code">' + escapeHtml(body) + '</span><span class="mk">' + escapeHtml(closing) + '</span></div>';
+    return open + '<span class="mk">' + escapeHtml(lines[0] + '\n') + '</span><span class="code">' + highlightCode(middle.join('\n'), lang) + '</span><span class="mk">' + escapeHtml(closing) + '</span></div>';
   }
   if (b.type === 'hr') return '<div class="' + cls + '"' + attrs + '><span class="mk">' + escapeHtml(b.raw) + '</span></div>';
 
@@ -1276,6 +1323,8 @@ function placeCaretInBlock(block, pos) {
   }
   // No visible text at/after pos (e.g. an empty "- [ ] " item): sit before the
   // trailing <br>, or at the very end of the block.
+  const codeEl = block.querySelector(':scope > .code');
+  if (codeEl) { placeRangeAt(codeEl, codeEl.childNodes.length); return; }
   const kids = Array.from(block.childNodes);
   const br = kids.length && kids[kids.length - 1].nodeName === 'BR' ? kids.length - 1 : kids.length;
   placeRangeAt(block, br);
@@ -1730,13 +1779,114 @@ async function insertImageFile(file, bookmark) {
   }
 }
 
-function renderMathPreview(source) {
-  const preview = $('math-live-preview');
-  if (!preview) return;
-  const value = String(source || '').trim();
-  preview.innerHTML = value
-    ? '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">' + latexToMathML(value) + '</math>'
-    : '<span class="math-preview-empty">输入 LaTeX 后，这里会显示公式预览</span>';
+/* ---------- optional renderers (KaTeX, highlight.js), pinned + SRI ---------- */
+const ASSETS = {
+  katex: {
+    global: 'katex',
+    js: ['https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js', 'sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg'],
+    css: ['https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css', 'sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+']
+  },
+  hljs: {
+    global: 'hljs',
+    js: ['https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.10.0/highlight.min.js', 'sha384-GdEWAbCjn+ghjX0gLx7/N1hyTVmPAjdC2OvoAA0RyNcAOhqwtT8qnbCxWle2+uJX']
+  }
+};
+const assetPromises = {};
+function loadAsset(name) {
+  const a = ASSETS[name];
+  if (window[a.global]) return Promise.resolve(window[a.global]);
+  if (assetPromises[name]) return assetPromises[name];
+  assetPromises[name] = new Promise((resolve, reject) => {
+    if (a.css) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet'; link.href = a.css[0]; link.integrity = a.css[1]; link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+    }
+    const script = document.createElement('script');
+    script.src = a.js[0]; script.integrity = a.js[1]; script.crossOrigin = 'anonymous'; script.async = true;
+    script.onload = () => window[a.global] ? resolve(window[a.global]) : reject(new Error(name));
+    script.onerror = () => reject(new Error(name));
+    document.head.appendChild(script);
+  });
+  return assetPromises[name];
+}
+
+/* ---------- math ---------- */
+function renderTex(expr, display) {
+  if (window.katex) {
+    try { return window.katex.renderToString(expr, { displayMode: !!display, throwOnError: false, strict: 'ignore' }); } catch (e) { /* fall back */ }
+  }
+  return '<math xmlns="http://www.w3.org/1998/Math/MathML"' + (display ? ' display="block"' : '') + '>' + latexToMathML(expr) + '</math>';
+}
+function ensureKatex() {
+  if (window.katex) return;
+  loadAsset('katex').then(refreshMathBlocks).catch(() => {});
+}
+function refreshMathBlocks() {
+  editor.querySelectorAll('.math-block').forEach((el) => {
+    const p = el.querySelector('.math-preview');
+    if (p) p.innerHTML = renderTex(mathExpression(el.dataset.raw), true);
+  });
+}
+
+const T = String.raw;
+const MATH_PALETTE = [
+  ['常用', [T`\frac{■}{■}`, T`\sqrt{■}`, T`■^{■}`, T`■_{■}`, T`\sum_{■}^{■}`, T`\int_{■}^{■}`, T`\lim_{■ \to ■}`, T`\left( ■ \right)`,
+            T`\times`, T`\cdot`, T`\pm`, T`\leq`, T`\geq`, T`\neq`, T`\approx`, T`\infty`, T`\partial`, T`\alpha`, T`\theta`, T`\pi`]],
+  ['结构', [T`\frac{■}{■}`, T`\dfrac{■}{■}`, T`\sqrt[■]{■}`, T`■_{■}^{■}`, T`\binom{■}{■}`, T`\left( ■ \right)`, T`\left[ ■ \right]`,
+            T`\left\{ ■ \right\}`, T`\left| ■ \right|`, T`\left\| ■ \right\|`, T`\overset{■}{■}`, T`\underset{■}{■}`, T`\underbrace{■}_{■}`, T`\overbrace{■}^{■}`,
+            T`\begin{pmatrix} ■ & ■ \\ ■ & ■ \end{pmatrix}`, T`\begin{bmatrix} ■ & ■ \\ ■ & ■ \end{bmatrix}`, T`\begin{vmatrix} ■ & ■ \\ ■ & ■ \end{vmatrix}`,
+            T`\begin{cases} ■ & ■ \\ ■ & ■ \end{cases}`, T`\begin{aligned} ■ &= ■ \\ &= ■ \end{aligned}`]],
+  ['运算', [T`\times`, T`\div`, T`\pm`, T`\mp`, T`\cdot`, T`\circ`, T`\ast`, T`\leq`, T`\geq`, T`\neq`, T`\approx`, T`\equiv`, T`\sim`, T`\simeq`, T`\propto`,
+            T`\ll`, T`\gg`, T`\infty`, T`\partial`, T`\nabla`, T`\forall`, T`\exists`, T`\in`, T`\notin`, T`\subset`, T`\subseteq`, T`\supset`, T`\cup`, T`\cap`,
+            T`\emptyset`, T`\prod_{■}^{■}`, T`\iint`, T`\oint`, T`\mathrm{d}`, T`\log`, T`\ln`, T`\exp`, T`\sin`, T`\cos`, T`\tan`, T`\max`, T`\min`, T`\arg\max`,
+            T`\cdots`, T`\ldots`, T`\vdots`, T`\ddots`, T`\perp`, T`\parallel`, T`\angle`, T`\therefore`, T`\because`]],
+  ['希腊', 'alpha beta gamma delta epsilon varepsilon zeta eta theta vartheta iota kappa lambda mu nu xi pi rho sigma tau upsilon phi varphi chi psi omega Gamma Delta Theta Lambda Xi Pi Sigma Upsilon Phi Psi Omega'.split(' ').map((x) => '\\' + x)],
+  ['箭头', [T`\to`, T`\gets`, T`\leftrightarrow`, T`\Rightarrow`, T`\Leftarrow`, T`\Leftrightarrow`, T`\implies`, T`\iff`, T`\mapsto`, T`\uparrow`, T`\downarrow`,
+            T`\nearrow`, T`\searrow`, T`\longrightarrow`, T`\xrightarrow{■}`, T`\rightleftharpoons`]],
+  ['修饰', [T`\hat{■}`, T`\bar{■}`, T`\vec{■}`, T`\dot{■}`, T`\ddot{■}`, T`\tilde{■}`, T`\widehat{■}`, T`\overline{■}`, T`\underline{■}`,
+            T`\mathbb{■}`, T`\mathcal{■}`, T`\mathbf{■}`, T`\boldsymbol{■}`, T`\mathrm{■}`, T`\mathsf{■}`, T`\text{■}`, T`\operatorname{■}`, T`\color{red}{■}`, T`\boxed{■}`, T`\cancel{■}`]]
+];
+const MATH_COMMANDS = (() => {
+  const seen = new Map();
+  const add = (tpl) => { const m = tpl.match(/^\\([A-Za-z]+)/); if (m && !seen.has(m[1])) seen.set(m[1], tpl); };
+  MATH_PALETTE.forEach((group) => group[1].forEach(add));
+  [T`\quad`, T`\qquad`, T`\prime`, T`\degree`, T`\displaystyle`, T`\limits`, T`\left`, T`\right`, T`\begin{■}`, T`\end{■}`, T`\sinh`, T`\cosh`, T`\det`, T`\lVert ■ \rVert`].forEach(add);
+  return Array.from(seen, ([name, tpl]) => ({ name, tpl }));
+})();
+const mathPreviewTex = (tpl) => tpl.replace(/■/g, '{\\color{#9aa0a6}\\square}');
+
+function mathEmptyHtml() { return '<span class="math-preview-empty">在下方输入 LaTeX，或从符号面板选择</span>'; }
+
+function insertMathTemplate(src, tpl, from, to) {
+  const s = from == null ? src.selectionStart : from;
+  const e = to == null ? src.selectionEnd : to;
+  const sel = from == null ? src.value.slice(s, e) : '';
+  let text = tpl;
+  if (sel && text.includes('■')) text = text.replace('■', sel);
+  const slot = text.indexOf('■');
+  let clean = text.replace(/■/g, '');
+  if (/^\\[A-Za-z]+$/.test(clean)) clean += ' ';   // keep "\\alpha x" from becoming "\\alphax"
+  src.setRangeText(clean, s, e, 'end');
+  const caret = slot >= 0 ? s + slot : s + clean.length;
+  src.setSelectionRange(caret, caret);
+  src.focus();
+}
+
+/* Tab / Shift+Tab jump between empty groups {}, matrix cells "& " and rows "\\ ". */
+function mathSlotTarget(value, from, dir) {
+  const re = /\{\}|&\s|\\\\\s/g;
+  const targets = [];
+  let m;
+  while ((m = re.exec(value))) targets.push(m.index + (m[0] === '{}' ? 1 : m[0].length));
+  if (dir > 0) {
+    const t = targets.find((x) => x > from);
+    if (t != null) return t;
+    const close = value.indexOf('}', from);
+    return close >= 0 ? close + 1 : value.length;
+  }
+  const back = targets.filter((x) => x < from);
+  return back.length ? back[back.length - 1] : 0;
 }
 
 function openMathEditor(options) {
@@ -1748,77 +1898,279 @@ function openMathEditor(options) {
   const initial = isEdit ? mathExpression(opts.raw || '') : '';
   const startRange = isEdit ? null : (selectionOffsets() || (() => {
     const caret = caretOffset();
-    return {start:caret == null ? (note.body || '').length : caret,end:caret == null ? (note.body || '').length : caret};
+    const at = caret == null ? (note.body || '').length : caret;
+    return { start: at, end: at };
   })());
+  let tab = 0;
   const html =
     '<section class="modal math-editor-modal" role="dialog" aria-modal="true" aria-labelledby="math-editor-title">' +
-      '<header class="modal-head"><div><h2 id="math-editor-title">'+(isEdit?'编辑公式':'插入公式')+'</h2><p class="math-editor-subtitle">使用 LaTeX 编写，预览会实时更新</p></div><button class="modal-close" data-close aria-label="关闭"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header>' +
-      '<div class="math-snippets" aria-label="常用公式">' +
-        '<button type="button" data-math-snippet="\frac{}{}" data-caret-back="3">分数</button>' +
-        '<button type="button" data-math-snippet="\sqrt{}" data-caret-back="1">根号</button>' +
-        '<button type="button" data-math-snippet="x_{i}" data-caret-back="1">下标</button>' +
-        '<button type="button" data-math-snippet="x^{2}" data-caret-back="1">上标</button>' +
-        '<button type="button" data-math-snippet="\alpha">α</button>' +
-        '<button type="button" data-math-snippet="\sum_{i=1}^{n}">求和</button>' +
-        '<button type="button" data-math-snippet="\int_{a}^{b}">积分</button>' +
-      '</div>' +
-      '<label class="field-label" for="math-source">LaTeX</label>' +
-      '<textarea id="math-source" class="math-source" spellcheck="false" rows="4" placeholder="例如：\frac{a}{b} = c">'+escapeHtml(initial)+'</textarea>' +
-      '<div class="math-preview-label">预览</div><div id="math-live-preview" class="math-live-preview"></div>' +
-      '<div class="modal-actions"><button type="button" class="btn ghost" data-close>取消</button><button type="button" class="btn primary" id="math-save">保存公式</button></div>' +
+      '<header class="modal-head"><h2 id="math-editor-title">' + (isEdit ? '编辑公式' : '插入公式') + '</h2><button class="modal-close" data-close aria-label="关闭"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header>' +
+      '<div id="math-live-preview" class="math-live-preview" aria-live="polite"></div>' +
+      '<p class="math-error" id="math-error" hidden></p>' +
+      '<div class="math-tabs" role="tablist">' + MATH_PALETTE.map((g, i) => '<button type="button" role="tab" data-math-tab="' + i + '" aria-selected="' + (i === 0) + '">' + g[0] + '</button>').join('') + '</div>' +
+      '<div class="math-palette" id="math-palette" role="tabpanel"></div>' +
+      '<div class="math-source-wrap"><textarea id="math-source" class="math-source" spellcheck="false" autocapitalize="off" autocomplete="off" rows="3" aria-label="LaTeX 源码" placeholder="例如：E = mc^2，输入 \\ 可补全命令">' + escapeHtml(initial) + '</textarea>' +
+      '<div class="math-suggest" id="math-suggest" role="listbox" hidden></div></div>' +
+      '<p class="math-hint"><kbd>Tab</kbd> 下一个空位 · <kbd>\\</kbd> 补全命令 · 选中文字后点模板可包裹 · <kbd>' + (/Mac|iPhone|iPad/i.test(navigator.platform || '') ? '⌘' : 'Ctrl') + '</kbd><kbd>↵</kbd> 保存</p>' +
+      '<div class="modal-actions">' + (isEdit ? '<button type="button" class="btn danger" id="math-delete" style="margin-right:auto">删除公式</button>' : '') +
+        '<button type="button" class="btn ghost" data-close>取消</button><button type="button" class="btn primary" id="math-save">' + (isEdit ? '保存' : '插入') + '</button></div>' +
     '</section>';
   openModal(html);
   const source = $('math-source');
-  const update = () => renderMathPreview(source.value);
-  source.addEventListener('input', update);
-  source.addEventListener('keydown', (event) => {
-    if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
-      event.preventDefault();
-      $('math-save').click();
+  const preview = $('math-live-preview');
+  const errorEl = $('math-error');
+  const palette = $('math-palette');
+  const suggestEl = $('math-suggest');
+  let suggestions = [], suggestIndex = 0, suggestFrom = -1;
+
+  const update = () => {
+    const value = source.value.trim();
+    if (!value) { preview.innerHTML = mathEmptyHtml(); preview.classList.remove('stale'); errorEl.hidden = true; return; }
+    if (window.katex) {
+      try {
+        preview.innerHTML = window.katex.renderToString(value, { displayMode: true, throwOnError: true, strict: 'ignore' });
+        preview.classList.remove('stale');
+        errorEl.hidden = true;
+      } catch (e) {
+        preview.classList.add('stale');
+        errorEl.textContent = '语法问题：' + String(e.message || e).replace(/^KaTeX parse error:\s*/, '');
+        errorEl.hidden = false;
+      }
+    } else {
+      preview.innerHTML = renderTex(value, true);
+    }
+  };
+  const renderPalette = () => {
+    palette.innerHTML = MATH_PALETTE[tab][1].map((tpl, i) =>
+      '<button type="button" class="math-key" data-math-key="' + i + '" title="' + escapeHtml(tpl.replace(/■/g, '…')) + '">' + renderTex(mathPreviewTex(tpl), false) + '</button>').join('');
+  };
+  const hideSuggest = () => { suggestions = []; suggestEl.hidden = true; suggestEl.innerHTML = ''; };
+  const renderSuggest = () => {
+    suggestEl.innerHTML = suggestions.map((c, i) =>
+      '<button type="button" role="option" data-suggest="' + i + '" aria-selected="' + (i === suggestIndex) + '"><span class="sg-glyph">' + renderTex(mathPreviewTex(c.tpl), false) + '</span><code>\\' + escapeHtml(c.name) + '</code></button>').join('');
+    suggestEl.hidden = !suggestions.length;
+  };
+  const refreshSuggest = () => {
+    const pos = source.selectionStart;
+    if (pos !== source.selectionEnd) return hideSuggest();
+    const m = source.value.slice(0, pos).match(/\\([A-Za-z]+)$/);
+    if (!m) return hideSuggest();
+    const q = m[1].toLowerCase();
+    suggestFrom = pos - m[0].length;
+    const starts = MATH_COMMANDS.filter((c) => c.name.toLowerCase().startsWith(q));
+    const contains = MATH_COMMANDS.filter((c) => !c.name.toLowerCase().startsWith(q) && c.name.toLowerCase().includes(q));
+    suggestions = starts.concat(contains).slice(0, 8);
+    if (suggestions.length === 1 && suggestions[0].name === m[1]) suggestions = [];
+    suggestIndex = 0;
+    renderSuggest();
+  };
+  const acceptSuggest = (i) => {
+    const c = suggestions[i];
+    if (!c) return;
+    insertMathTemplate(source, c.tpl, suggestFrom, source.selectionStart);
+    hideSuggest();
+    update();
+  };
+
+  $('modal-root').querySelectorAll('[data-math-tab]').forEach((b) => b.addEventListener('click', () => {
+    tab = Number(b.dataset.mathTab);
+    $('modal-root').querySelectorAll('[data-math-tab]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    renderPalette();
+  }));
+  palette.addEventListener('mousedown', (e) => e.preventDefault());
+  $('modal-root').querySelector('.math-tabs').addEventListener('mousedown', (e) => e.preventDefault());
+  $('modal-root').querySelector('.math-editor-modal').addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && e.target !== source) { e.preventDefault(); $('math-save').click(); }
+  });
+  palette.addEventListener('click', (e) => {
+    const key = e.target.closest('[data-math-key]');
+    if (!key) return;
+    insertMathTemplate(source, MATH_PALETTE[tab][1][Number(key.dataset.mathKey)]);
+    hideSuggest();
+    update();
+  });
+  suggestEl.addEventListener('mousedown', (e) => e.preventDefault());
+  suggestEl.addEventListener('click', (e) => { const b = e.target.closest('[data-suggest]'); if (b) acceptSuggest(Number(b.dataset.suggest)); });
+  source.addEventListener('input', () => { update(); refreshSuggest(); });
+  source.addEventListener('click', refreshSuggest);
+  source.addEventListener('keydown', (e) => {
+    if (e.isComposing || e.keyCode === 229) return;
+    const mod = e.metaKey || e.ctrlKey;
+    if (mod && e.key === 'Enter') { e.preventDefault(); $('math-save').click(); return; }
+    if (suggestions.length) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        suggestIndex = (suggestIndex + (e.key === 'ArrowDown' ? 1 : suggestions.length - 1)) % suggestions.length;
+        renderSuggest();
+        return;
+      }
+      if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); acceptSuggest(suggestIndex); return; }
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); hideSuggest(); return; }
+    }
+    const v = source.value, s = source.selectionStart, end = source.selectionEnd;
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const t = mathSlotTarget(v, e.shiftKey ? s : end, e.shiftKey ? -1 : 1);
+      source.setSelectionRange(t, t);
+      return;
+    }
+    if (e.key === '{' && !mod) {
+      e.preventDefault();
+      source.setRangeText('{' + v.slice(s, end) + '}', s, end, 'end');
+      source.setSelectionRange(s + 1, end + 1);
+      update();
+      return;
+    }
+    if (e.key === '}' && s === end && v[s] === '}') { e.preventDefault(); source.setSelectionRange(s + 1, s + 1); return; }
+    if (e.key === 'Backspace' && s === end && v[s - 1] === '{' && v[s] === '}') {
+      e.preventDefault();
+      source.setRangeText('', s - 1, s + 1, 'end');
+      update();
     }
   });
-  $('modal-root').querySelectorAll('[data-math-snippet]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const snippet = button.dataset.mathSnippet || '';
-      const start = source.selectionStart == null ? source.value.length : source.selectionStart;
-      const end = source.selectionEnd == null ? start : source.selectionEnd;
-      source.setRangeText(snippet,start,end,'end');
-      const back = Number(button.dataset.caretBack || 0);
-      if (back) source.setSelectionRange(Math.max(start+snippet.length-back,start),Math.max(start+snippet.length-back,start));
-      source.focus();
-      update();
-    });
-  });
+
+  const writeBack = (markdown) => {
+    const activeNote = currentNote();
+    if (!activeNote || activeNote.id !== noteId) { closeModal(); toast('笔记已切换，请重新编辑公式'); return; }
+    const body = activeNote.body || '';
+    let next, caret;
+    if (isEdit) {
+      const currentBlock = splitBlocks(body).find((block) => block.start === opts.start && block.type === 'math');
+      if (!currentBlock || currentBlock.raw !== opts.raw) { closeModal(); toast('公式内容已变化，请重新打开编辑'); return; }
+      let endAt = currentBlock.start + currentBlock.raw.length;
+      if (!markdown && body[endAt] === '\n') endAt++;
+      next = body.slice(0, currentBlock.start) + markdown + body.slice(endAt);
+      caret = currentBlock.start + markdown.length;
+    } else {
+      const from = Math.max(0, Math.min(body.length, startRange.start));
+      const to = Math.max(from, Math.min(body.length, startRange.end));
+      const before = body.slice(0, from), after = body.slice(to);
+      const lead = before && !before.endsWith('\n') ? '\n\n' : '';
+      const tail = after.startsWith('\n') ? '' : after ? '\n\n' : '\n';
+      next = before + lead + markdown + tail + after;
+      caret = from + lead.length + markdown.length + 1;
+    }
+    closeModal();
+    editor.focus({ preventScroll: true });
+    applyBody(next, Math.min(caret, next.length), true);
+    ensureCaretVisible();
+  };
   $('math-save').addEventListener('click', () => {
     const expression = source.value.trim();
     if (!expression) { source.focus(); toast('先输入公式内容'); return; }
-    const activeNote = currentNote();
-    if (!activeNote || activeNote.id !== noteId) { closeModal(); toast('笔记已切换，请重新编辑公式'); return; }
-    const markdown = '$$\n' + expression + '\n$$';
-    let next, caret;
-    if (isEdit) {
-      const body = activeNote.body || '';
-      const currentBlock = splitBlocks(body).find((block) => block.start === opts.start && block.type === 'math');
-      if (!currentBlock || currentBlock.raw !== opts.raw) { closeModal(); toast('公式内容已变化，请重新打开编辑'); return; }
-      next = body.slice(0,currentBlock.start) + markdown + body.slice(currentBlock.start+currentBlock.raw.length);
-      caret = currentBlock.start + markdown.length;
-    } else {
-      const body = activeNote.body || '';
-      const from = Math.max(0,Math.min(body.length,startRange.start));
-      const to = Math.max(from,Math.min(body.length,startRange.end));
-      const before = body.slice(0,from), after = body.slice(to);
-      const lead = before && !before.endsWith('\n') ? '\n\n' : '';
-      const tail = after && !after.startsWith('\n') ? '\n\n' : '';
-      next = before + lead + markdown + tail + after;
-      caret = from + lead.length + markdown.length;
-    }
-    closeModal();
-    focusEditor();
-    applyBody(next,caret,true);
-    ensureCaretVisible();
+    writeBack('$$\n' + expression + '\n$$');
   });
+  if (isEdit) $('math-delete').addEventListener('click', () => writeBack(''));
+
+  renderPalette();
   update();
   source.focus();
+  source.setSelectionRange(source.value.length, source.value.length);
+  if (!window.katex) loadAsset('katex').then(() => { if (document.contains(source)) { renderPalette(); update(); if (suggestions.length) renderSuggest(); } refreshMathBlocks(); }).catch(() => {});
+}
+
+/* ---------- code blocks ---------- */
+const CODE_LANGS = [['', '纯文本'], ['python', 'Python'], ['javascript', 'JavaScript'], ['typescript', 'TypeScript'], ['java', 'Java'], ['c', 'C'], ['cpp', 'C++'],
+  ['csharp', 'C#'], ['go', 'Go'], ['rust', 'Rust'], ['kotlin', 'Kotlin'], ['swift', 'Swift'], ['objectivec', 'Objective-C'], ['php', 'PHP'], ['ruby', 'Ruby'],
+  ['lua', 'Lua'], ['r', 'R'], ['perl', 'Perl'], ['bash', 'Shell'], ['sql', 'SQL'], ['json', 'JSON'], ['yaml', 'YAML'], ['xml', 'HTML / XML'], ['css', 'CSS'],
+  ['scss', 'SCSS'], ['markdown', 'Markdown'], ['diff', 'Diff'], ['makefile', 'Makefile'], ['ini', 'INI / TOML'], ['graphql', 'GraphQL'], ['vbnet', 'VB.NET']];
+const LANG_ALIASES = { js: 'javascript', jsx: 'javascript', mjs: 'javascript', ts: 'typescript', tsx: 'typescript', py: 'python', sh: 'bash', shell: 'bash', zsh: 'bash',
+  console: 'bash', yml: 'yaml', html: 'xml', htm: 'xml', svg: 'xml', 'c++': 'cpp', cc: 'cpp', hpp: 'cpp', cxx: 'cpp', h: 'c', cs: 'csharp', 'c#': 'csharp', rs: 'rust',
+  kt: 'kotlin', rb: 'ruby', md: 'markdown', toml: 'ini', objc: 'objectivec', golang: 'go', text: '', txt: '', plain: '', plaintext: '' };
+const normLang = (lang) => { const l = String(lang || '').toLowerCase(); return Object.prototype.hasOwnProperty.call(LANG_ALIASES, l) ? LANG_ALIASES[l] : l; };
+function codeLang(raw) { const m = String(raw || '').match(/^\s*`{3,}\s*([^\s`]*)/); return m ? m[1] : ''; }
+function langLabel(lang) {
+  const id = normLang(lang);
+  const hit = CODE_LANGS.find((l) => l[0] === id);
+  if (hit) return hit[1];
+  const def = window.hljs && window.hljs.getLanguage(id);
+  return def && def.name ? def.name : lang;
+}
+function highlightCode(body, lang) {
+  const id = normLang(lang);
+  if (!id) return escapeHtml(body);
+  const hl = window.hljs;
+  if (!hl) { ensureHljs(); return escapeHtml(body); }
+  if (!hl.getLanguage(id)) return escapeHtml(body);
+  try { return hl.highlight(body, { language: id, ignoreIllegals: true }).value; } catch (e) { return escapeHtml(body); }
+}
+function ensureHljs() {
+  if (window.hljs) return;
+  loadAsset('hljs').then(refreshCodeBlocks).catch(() => {});
+}
+function refreshCodeBlocks() {
+  const sel = window.getSelection();
+  const inside = (el) => sel && sel.rangeCount && el.contains(sel.getRangeAt(0).startContainer);
+  editor.querySelectorAll('.blk.code').forEach((el) => {
+    const code = el.querySelector('.code');
+    if (!code || inside(el)) return;
+    code.innerHTML = highlightCode(code.textContent, el.dataset.lang || '');
+    const btn = el.querySelector('[data-code-lang]');
+    if (btn) btn.dataset.label = langLabel(el.dataset.lang || '');
+  });
+}
+function codeBlockChrome(lang, closed) {
+  const label = escapeHtml(langLabel(lang));
+  return '<button type="button" class="code-lang" contenteditable="false" tabindex="-1" data-code-lang data-label="' + label + '" aria-label="代码语言：' + label + '，点击切换"></button>' +
+    (closed ? '<button type="button" class="code-copy" contenteditable="false" tabindex="-1" data-code-copy aria-label="复制代码"></button>' : '');
+}
+function setCodeLang(index, lang) {
+  const note = currentNote();
+  if (!note) return;
+  const body = note.body || '';
+  const b = splitBlocks(body)[index];
+  if (!b || b.type !== 'code') return;
+  const lines = b.raw.split('\n');
+  const m = lines[0].match(/^(\s*`{3,})/);
+  if (!m) return;
+  lines[0] = m[1] + lang;
+  const raw = lines.join('\n');
+  const caret = b.closed && lines.length > 2 ? b.start + raw.length - lines[lines.length - 1].length - 1 : b.start + raw.length;
+  editor.focus({ preventScroll: true });
+  applyBody(body.slice(0, b.start) + raw + body.slice(b.start + b.raw.length), caret, true);
+}
+function openCodeLangMenu(block, anchor) {
+  closeRowContextMenu();
+  const index = Number(block.dataset.i);
+  const current = normLang(block.dataset.lang || '');
+  const r = anchor.getBoundingClientRect();
+  const left = Math.max(8, Math.min(r.left, window.innerWidth - 228));
+  const top = Math.max(8, Math.min(r.bottom + 6, window.innerHeight - 340));
+  const root = $('modal-root');
+  root.innerHTML = '<div class="context-menu code-lang-menu" id="row-context-menu" role="menu" style="left:' + left + 'px;top:' + top + 'px">' +
+    '<input class="lang-filter" id="lang-filter" placeholder="搜索语言…" autocomplete="off" spellcheck="false">' +
+    '<div class="lang-list">' + CODE_LANGS.map((l) => '<button type="button" data-lang-pick="' + l[0] + '"' + (l[0] === current ? ' class="on"' : '') + '>' + l[1] + '</button>').join('') + '</div></div>';
+  const menu = $('row-context-menu');
+  const filter = $('lang-filter');
+  const pick = (lang) => { closeRowContextMenu(); setCodeLang(index, lang); };
+  menu.querySelectorAll('[data-lang-pick]').forEach((b) => b.addEventListener('click', () => pick(b.dataset.langPick)));
+  filter.addEventListener('input', () => {
+    const q = filter.value.trim().toLowerCase();
+    menu.querySelectorAll('[data-lang-pick]').forEach((b) => { b.hidden = !!q && !(b.textContent.toLowerCase().includes(q) || b.dataset.langPick.includes(q)); });
+  });
+  filter.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const first = Array.from(menu.querySelectorAll('[data-lang-pick]')).find((b) => !b.hidden);
+      if (first) pick(first.dataset.langPick);
+      else if (filter.value.trim()) pick(filter.value.trim().toLowerCase().replace(/[^\w#+.-]/g, ''));
+    }
+  });
+  contextDismissHandler = (event) => { if (!menu.contains(event.target)) closeRowContextMenu(); };
+  document.addEventListener('pointerdown', contextDismissHandler, true);
+  if (window.matchMedia('(hover:hover)').matches) filter.focus();
+}
+function copyCodeBlock(block) {
+  const code = block.querySelector('.code');
+  const text = code ? code.textContent : '';
+  const done = () => toast('已复制代码');
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(() => toast('复制失败'));
+  else {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { toast('复制失败'); }
+    ta.remove();
+  }
 }
 
 function bindToolbar() {
@@ -3098,7 +3450,7 @@ function bind() {
   }, true);
   editor.addEventListener('mousedown', (e) => {
     // keep focus in the current cell so the floating tools don't vanish mid-click
-    if (e.target.closest && e.target.closest('[data-table-action],.taskbox')) e.preventDefault();
+    if (e.target.closest && e.target.closest('[data-table-action],.taskbox,[data-code-lang],[data-code-copy]')) e.preventDefault();
   }, true);
   editor.addEventListener('input', (e) => {
     if (composing || inTableCell(e)) return;
@@ -3175,6 +3527,10 @@ function bind() {
   });
 
   editor.addEventListener('click', (e) => {
+    const langBtn = e.target.closest && e.target.closest('[data-code-lang]');
+    if (langBtn) { e.preventDefault(); openCodeLangMenu(langBtn.closest('.blk'), langBtn); return; }
+    const copyBtn = e.target.closest && e.target.closest('[data-code-copy]');
+    if (copyBtn) { e.preventDefault(); copyCodeBlock(copyBtn.closest('.blk')); return; }
     const imageDelete = e.target.closest && e.target.closest('[data-delete-image]');
     if (imageDelete) {
       e.preventDefault();
