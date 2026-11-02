@@ -540,6 +540,14 @@ body.dark .toast{background:#e9ebe0;color:#1c1f18}
 html.standalone{height:calc(100% + var(--viewport-gap, 0px))}
 html.standalone .app{height:auto;bottom:calc(-1 * var(--viewport-gap, 0px))}
 html.standalone .sidebar,html.standalone .note-sidebar,html.standalone .overlay,html.standalone .modal-backdrop{bottom:calc(-1 * var(--viewport-gap, 0px))}
+/* the panels' backgrounds reach the screen edge; their contents keep clear of it */
+html.standalone .sidebar{padding-bottom:calc(12px + env(safe-area-inset-bottom) + var(--viewport-gap, 0px))}
+html.standalone .list-footer{padding-bottom:calc(10px + env(safe-area-inset-bottom) + var(--viewport-gap, 0px))}
+@media (max-width:760px){
+  html.standalone .modal{padding-bottom:calc(22px + env(safe-area-inset-bottom) + var(--viewport-gap, 0px))}
+  html.standalone .modal.menu{padding-bottom:calc(10px + env(safe-area-inset-bottom) + var(--viewport-gap, 0px))}
+  html.standalone .toast{bottom:calc(76px + env(safe-area-inset-bottom) + var(--viewport-gap, 0px))}
+}
 @keyframes sheet{from{transform:translateY(40px);opacity:.4}}
 @media (pointer:coarse){
   .nav-item{min-height:46px}
