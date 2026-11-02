@@ -537,6 +537,10 @@ body.dark .toast{background:#e9ebe0;color:#1c1f18}
   /* reach under the floating Safari toolbar instead of stopping above it */
   @media (max-width:760px){.app{bottom:auto;height:100lvh}}
 }
+/* On phones the editor fills the screen, so everything behind it (body, shell)
+   uses the editor surface: any area iOS leaves uncovered at the bottom of a
+   home-screen app then matches the page instead of showing a darker band. */
+@media (max-width:760px){body,.app{background:var(--paper)}}
 html.standalone{height:calc(100% + var(--viewport-gap, 0px))}
 html.standalone .app{height:auto;bottom:calc(-1 * var(--viewport-gap, 0px))}
 html.standalone .sidebar,html.standalone .note-sidebar,html.standalone .overlay,html.standalone .modal-backdrop{bottom:calc(-1 * var(--viewport-gap, 0px))}
