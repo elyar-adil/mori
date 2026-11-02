@@ -63,6 +63,27 @@ body.dark{
   color-scheme:dark;
 }
 
+/* The navigation column is a tinted near-black in both modes: a dark frame
+   around the light list and page. Its tokens are re-scoped so every control
+   inside (nav items, groups, buttons) adapts without extra rules. */
+.sidebar{
+  --side:hsl(var(--h) calc(var(--t) * 30%) 11.5%);
+  --ink:hsl(var(--h) calc(var(--t) * 18%) 94%);
+  --muted:hsl(var(--h) calc(var(--t) * 12%) 73%);
+  --faint:hsl(var(--h) calc(var(--t) * 10%) 57%);
+  --hover:hsl(var(--h) calc(var(--t) * 24%) 17.5%);
+  --line:hsl(var(--h) calc(var(--t) * 18%) 21%);
+  --paper:hsl(var(--h) calc(var(--t) * 22%) 15%);
+  --accent:hsl(var(--h) var(--ds) 72%);
+  --accent-text:hsl(var(--h) var(--ds) 79%);
+  --accent-soft:hsl(var(--h) calc(var(--t) * 42%) 22%);
+  --code-bg:hsl(var(--h) calc(var(--t) * 22%) 18%);
+  color:var(--ink);
+  color-scheme:dark;
+}
+body.dark .sidebar{--side:hsl(var(--h) calc(var(--t) * 22%) 6.5%);--hover:hsl(var(--h) calc(var(--t) * 18%) 13%);--accent-soft:hsl(var(--h) calc(var(--t) * 35%) 18%)}
+.sidebar .brand-mark img{mix-blend-mode:normal}
+
 /* ---------- base ---------- */
 *{box-sizing:border-box}
 [hidden]{display:none!important}
