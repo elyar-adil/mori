@@ -182,13 +182,14 @@ body.dark .bottom-btn .icon-moon{display:block}
 .search::-webkit-search-cancel-button{display:none}
 .search-wrap kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);font:11.5px var(--ui);color:var(--faint);pointer-events:none;padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:var(--list-bg)}
 .list{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:4px 16px 16px;min-height:0}
-.note-item{display:block;position:relative;width:100%;text-align:left;padding:11px 10px 12px;border-radius:11px;margin:2px 0;min-width:0;transition:background .12s}
+.note-item{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;display:block;position:relative;width:100%;text-align:left;padding:11px 10px 12px;border-radius:11px;margin:2px 0;min-width:0;transition:background .12s}
 .note-item:hover{background:color-mix(in srgb,var(--hover) 80%,transparent)}
 .note-item.active{background:var(--accent-soft)}
 .note-top{display:flex;align-items:center;gap:6px;min-width:0}
 .note-title{font:600 14.5px/1.4 var(--ui);letter-spacing:-.01em;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
-.note-pin{width:13px;height:13px;color:var(--accent);flex-shrink:0;display:grid;place-items:center}
-.note-pin svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.note-pin{width:18px;height:18px;margin:-2px -3px -2px 0;color:var(--accent-text);flex-shrink:0;display:grid;place-items:center}
+.note-pin svg{width:16px;height:16px;overflow:visible;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.note-pin .pin-body,.menu-item .pin-body{fill:currentColor;fill-opacity:.18}
 .note-excerpt{display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;font-size:13px;line-height:1.55;color:var(--muted);margin-top:4px}
 .note-date{display:block;font-size:12px;color:var(--faint);margin-top:6px}
 .list-empty{padding:48px 18px;text-align:center;font-size:13.5px;color:var(--faint);line-height:1.8}
@@ -554,6 +555,8 @@ html.standalone .list-footer{padding-bottom:calc(10px + env(safe-area-inset-bott
 }
 @keyframes sheet{from{transform:translateY(40px);opacity:.4}}
 @media (pointer:coarse){
+  .context-menu{width:236px}
+  .context-menu button{height:44px;font-size:15px}
   .nav-item{min-height:46px}
   .note-item{padding-block:13px}
   .bottom-btn{width:44px;height:44px}
@@ -671,6 +674,7 @@ let saveTimer = null;
 let syncTimer = null;
 let toastTimer = null;
 let contextDismissHandler = null;
+let longPressAt = 0;
 let hist = { id: null, states: [], index: -1, last: 0 };
 
 /* ---------- small helpers ---------- */
@@ -2313,7 +2317,7 @@ function toggleTask(offset) {
 }
 
 /* ---------- note operations ---------- */
-function openNote(id, focus) {
+function openNote(id, focus, stay) {
   const note = state.notes.find((n) => n.id === id);
   if (!note) return;
   state.currentId = id;
@@ -2325,7 +2329,7 @@ function openNote(id, focus) {
   renderChrome();
   growTitle();
   canvas.scrollTop = 0;
-  closeDrawers();
+  if (!stay) closeDrawers();
   const activeRow = $('list').querySelector('.note-item.active');
   if (activeRow && activeRow.scrollIntoView) activeRow.scrollIntoView({ block: 'nearest' });
   if (focus) focusEditor();
@@ -2451,11 +2455,12 @@ function renderList() {
     host.innerHTML = '<div class="list-empty">' + (state.search.trim() ? '没有匹配的笔记' : trashMode ? '回收站是空的' : '还没有笔记。<br>点右上角的 + 开始写。') + '</div>';
     return;
   }
+  const canDrag = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
   host.innerHTML = list.map((n) => {
     const t = (n.title || '').trim();
-    return '<button class="note-item' + (n.id === state.currentId ? ' active' : '') + '" data-id="' + escapeHtml(n.id) + '"' + (n.deletedAt ? '' : ' draggable="true"') + '>' +
+    return '<button class="note-item' + (n.id === state.currentId ? ' active' : '') + '" data-id="' + escapeHtml(n.id) + '"' + (n.deletedAt || !canDrag ? '' : ' draggable="true"') + '>' +
       '<span class="note-top"><span class="note-title">' + escapeHtml(t || '无标题') + '</span>' +
-      (n.pinned && !n.deletedAt ? '<span class="note-pin"><svg viewBox="0 0 24 24"><path d="m14.5 3.5 6 6-3.2.8-3.9 3.9-.8 3.9-1.7-1.7L6 21l-1-1 4.7-4.8-1.7-1.7 3.9-.8 3.9-3.9Z"/></svg></span>' : '') +
+      (n.pinned && !n.deletedAt ? '<span class="note-pin"><svg viewBox="0 0 24 24"><path class="pin-body" d="M10 4v4.8l-3.1 3.6a1 1 0 0 0 .76 1.65h8.68a1 1 0 0 0 .76-1.65L14 8.8V4"/><path d="M8.6 4h6.8M12 14.1v6.4"/></svg></span>' : '') +
       '</span>' +
       '<span class="note-excerpt">' + escapeHtml(noteExcerpt(n)) + '</span>' +
       '<span class="note-date">' + fmtDate(n.updatedAt) + (n.deletedAt ? ' · 已删除' : '') + (n.folder && !viewFolder() ? '<span class="note-folder">' + escapeHtml(n.folder) + '</span>' : '') + '</span>' +
@@ -2463,7 +2468,12 @@ function renderList() {
   }).join('');
   host.querySelectorAll('[data-id]').forEach((el) => {
     el.addEventListener('click', () => openNote(el.dataset.id));
-    el.addEventListener('contextmenu', (e) => { e.preventDefault(); openNote(el.dataset.id, false); openRowContextMenu(el.dataset.id, e.clientX, e.clientY); });
+    el.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      if (Date.now() - longPressAt < 900) return;   // touch long-press already opened it
+      openNote(el.dataset.id, false, true);
+      openRowContextMenu(el.dataset.id, e.clientX, e.clientY);
+    });
   });
 }
 
@@ -2688,7 +2698,7 @@ function openNoteMenu() {
   const inTrash = !!n.deletedAt;
   const item = (id, icon, label, cls) =>
     '<button class="menu-item ' + (cls || '') + '" id="' + id + '"><svg viewBox="0 0 24 24">' + icon + '</svg>' + label + '</button>';
-  const pinIcon = '<path d="m14.5 3.5 6 6-3.2.8-3.9 3.9-.8 3.9-1.7-1.7L6 21l-1-1 4.7-4.8-1.7-1.7 3.9-.8 3.9-3.9Z"/>';
+  const pinIcon = '<path class="pin-body" d="M10 4v4.8l-3.1 3.6a1 1 0 0 0 .76 1.65h8.68a1 1 0 0 0 .76-1.65L14 8.8V4"/><path d="M8.6 4h6.8M12 14.1v6.4"/>';
   const starIcon = '<path d="m12 3.5 2.7 5.5 6 .9-4.35 4.2 1.03 6L12 17.25 6.62 20.1l1.03-6L3.3 9.9l6-.9Z"/>';
   const exportIcon = '<path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>';
   const trashIcon = '<path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"/>';
@@ -2939,6 +2949,36 @@ function bindLibrary() {
   });
 
   $('nav-panel-toggle').addEventListener('click', () => setNavCollapsed(!state.navCollapsed));
+
+  // long-press a note card on touch screens → the same menu as right-click
+  const list = $('list');
+  let lpTimer = null, lpStart = null;
+  const cancelPress = () => { clearTimeout(lpTimer); lpTimer = null; };
+  list.addEventListener('touchstart', (e) => {
+    const row = e.target.closest('[data-id]');
+    if (!row || e.touches.length > 1) return cancelPress();
+    const t = e.touches[0];
+    lpStart = { x: t.clientX, y: t.clientY };
+    cancelPress();
+    lpTimer = setTimeout(() => {
+      lpTimer = null;
+      longPressAt = Date.now();
+      if (navigator.vibrate) navigator.vibrate(8);
+      openNote(row.dataset.id, false, true);
+      openRowContextMenu(row.dataset.id, lpStart.x, lpStart.y);
+    }, 480);
+  }, { passive: true });
+  list.addEventListener('touchmove', (e) => {
+    if (!lpTimer || !lpStart) return;
+    const t = e.touches[0];
+    if (Math.abs(t.clientX - lpStart.x) > 10 || Math.abs(t.clientY - lpStart.y) > 10) cancelPress();
+  }, { passive: true });
+  list.addEventListener('touchend', (e) => { cancelPress(); if (Date.now() - longPressAt < 900) e.preventDefault(); });
+  list.addEventListener('touchcancel', cancelPress, { passive: true });
+  // the finger lifting after a long-press must not also open the note and close the list
+  document.addEventListener('click', (e) => {
+    if (Date.now() - longPressAt < 900 && e.target.closest && e.target.closest('#list')) { e.preventDefault(); e.stopPropagation(); }
+  }, true);
 }
 
 /* ---------- appearance ---------- */
