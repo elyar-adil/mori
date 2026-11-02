@@ -10,6 +10,8 @@
 <meta name="apple-mobile-web-app-title" content="Mori">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Mori</title>
+<link rel="apple-touch-icon" id="touch-icon" href="icons/apple-touch-icon-owl.png">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" id="page-favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%2350588f'/%3E%3Cpath d='M18 46V18h5l9 14 9-14h5v28h-5V27l-9 13-9-13v19Z' fill='%23fffefa'/%3E%3C/svg%3E">
 <style>
 /* ============================================================
@@ -535,6 +537,9 @@ body.dark .toast{background:#e9ebe0;color:#1c1f18}
   /* reach under the floating Safari toolbar instead of stopping above it */
   @media (max-width:760px){.app{bottom:auto;height:100lvh}}
 }
+html.standalone{height:calc(100% + var(--viewport-gap, 0px))}
+html.standalone .app{height:auto;bottom:calc(-1 * var(--viewport-gap, 0px))}
+html.standalone .sidebar,html.standalone .note-sidebar,html.standalone .overlay,html.standalone .modal-backdrop{bottom:calc(-1 * var(--viewport-gap, 0px))}
 @keyframes sheet{from{transform:translateY(40px);opacity:.4}}
 @media (pointer:coarse){
   .nav-item{min-height:46px}
@@ -2935,6 +2940,8 @@ function applyAnimal() {
   if (brandIcon) brandIcon.src = icon;
   if (emptyIcon) emptyIcon.src = icon;
   if (favicon) favicon.href = icon;
+  const touch = $('touch-icon');
+  if (touch) touch.href = 'icons/apple-touch-icon-' + state.animal + '.png';
   const t = THEMES[state.animal] || THEMES.owl;
   const st = document.body.style;
   st.setProperty('--h', t[0]);
@@ -2949,6 +2956,20 @@ function applyTypography() {
   document.body.style.setProperty('--doc-font', DOC_FONTS[state.docFont][1]);
   document.body.style.setProperty('--doc-size', DOC_SIZES[state.docSize][1]);
   growTitle();
+}
+
+/* Home-screen (standalone) web apps on iOS with a translucent status bar report
+   a viewport that is one status-bar height shorter than the screen, so a black
+   strip shows below the page. Measure the gap and let the shell reach past it. */
+function fixStandaloneViewport() {
+  const root = document.documentElement;
+  const standalone = navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+  root.classList.toggle('standalone', !!standalone);
+  if (!standalone) { root.style.removeProperty('--viewport-gap'); return; }
+  const portrait = innerHeight >= innerWidth;
+  const full = portrait ? Math.max(screen.width, screen.height) : Math.min(screen.width, screen.height);
+  const gap = Math.max(0, Math.min(80, Math.round(full - innerHeight)));
+  root.style.setProperty('--viewport-gap', gap + 'px');
 }
 
 /* ---------- dark mode ---------- */
@@ -3966,6 +3987,9 @@ function bind() {
 
 /* ---------- boot ---------- */
 function boot() {
+  fixStandaloneViewport();
+  window.addEventListener('resize', fixStandaloneViewport);
+  window.addEventListener('orientationchange', () => setTimeout(fixStandaloneViewport, 300));
   loadLocal();
   applyTypography();
   setNavCollapsed(state.navCollapsed);

@@ -5,6 +5,7 @@
 ## 文件
 
 - `index.html`：完整应用，CSS、JavaScript 全部内嵌。
+- `icons/`、`manifest.webmanifest`：添加到主屏幕用的图标（每个动物主题一张）和网页应用清单。
 
 ## 即时渲染
 
@@ -61,7 +62,9 @@ Mori 直接调用 GitHub Contents API，把每篇笔记保存为私有仓库指�
 
 ## 部署
 
-站点由 GitHub Actions 部署：推送到 `main` 后，`.github/workflows/pages.yml` 会把 `index.html` 作为站点根目录发布。
+站点由 GitHub Actions 部署：推送到 `main` 后，`.github/workflows/pages.yml` 会把 `index.html`、`manifest.webmanifest` 和 `icons/` 发布到站点根目录。
+
+在 iPhone 上用 Safari 打开页面 → 分享 → 添加到主屏幕，即可像应用一样全屏使用；主屏幕图标是添加时所选的动物主题，之后换主题需要删除后重新添加。
 
 - 源码：`https://github.com/elyar-adil/mori`
 - 页面：`https://elyar-adil.github.io/mori/`
