@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "Mori",
+  "short_name": "Mori",
+  "description": "边写边排版的 Markdown 笔记",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fcfdfe",
+  "theme_color": "#fcfdfe",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "icons/apple-touch-icon-hedgehog.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
