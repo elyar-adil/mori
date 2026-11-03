@@ -2994,6 +2994,10 @@ function applyAnimal() {
   if (favicon) favicon.href = icon;
   const touch = $('touch-icon');
   if (touch) touch.href = 'icons/apple-touch-icon-' + state.animal + '.png';
+  // Each animal has its own same-origin manifest so desktop installs use the
+  // icon selected in Settings instead of the generic fallback icon.
+  const manifest = document.querySelector('link[rel="manifest"]');
+  if (manifest) manifest.href = 'manifest-' + state.animal + '.webmanifest';
   const t = THEMES[state.animal] || THEMES.owl;
   const st = document.body.style;
   st.setProperty('--h', t[0]);
